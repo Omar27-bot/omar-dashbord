@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>O.M.A.R | Dashboard Souverain</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>O.M.A.R | Dashboard Souverain</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; style-src * 'unsafe-inline';">
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header>
-  <h1>🛡️ O.M.A.R</h1>
-  <div class="status-container">
-      <span id="status">● SYSTEM ONLINE</span>
-  </div>
+    <h1>🛡️ O.M.A.R</h1>
+    <div class="status-container">
+        <span id="status">● SYSTEM ONLINE</span>
+    </div>
 </header>
 
 <main>
     <section>
-      <h2>📊 Surveillance des Actifs</h2>
-      <div id="markets">
-        <p>En attente du signal de l'Empire...</p>
-      </div>
+        <h2>📊 Surveillance des Actifs</h2>
+        <div id="markets">
+            <p>Initialisation de la liaison satellite en cours...</p>
+        </div>
     </section>
 
     <section id="signals-section">
-      <h2>📡 Flux de Signaux</h2>
-      <ul id="signalList"></ul>
+        <h2>📡 Flux de Signaux</h2>
+        <ul id="signalList"></ul>
     </section>
 </main>
 
