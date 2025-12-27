@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>O.M.A.R</title>
+  <title>O.M.A.R | Dashboard Souverain</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,18 +11,29 @@
 
 <header>
   <h1>🛡️ O.M.A.R</h1>
-  <span id="status">ONLINE</span>
+  <div class="status-container">
+      <span id="status">● SYSTEM ONLINE</span>
+  </div>
 </header>
 
-<section id="markets">
-  <p>Chargement des marchés…</p>
-</section>
+<main>
+    <section>
+      <h2>📊 Surveillance des Actifs</h2>
+      <div id="markets">
+        <p>En attente du signal de l'Empire...</p>
+      </div>
+    </section>
 
-<section id="signals">
-  <h2>📡 Signaux</h2>
-  <ul id="signalList"></ul>
-</section>
+    <section id="signals-section">
+      <h2>📡 Flux de Signaux</h2>
+      <ul id="signalList"></ul>
+    </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script src="app.js"></script>
+
 </body>
 </html>
