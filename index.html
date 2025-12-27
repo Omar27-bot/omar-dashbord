@@ -2,41 +2,38 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>O.M.A.R | Dashboard Souverain</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <title>O.M.A.R | Mobile Command</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; style-src * 'unsafe-inline';">
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <header>
     <h1>🛡️ O.M.A.R</h1>
-    <div class="status-container">
-        <span id="status">● SYSTEM ONLINE</span>
-    </div>
+    <span id="status">● ONLINE</span>
 </header>
 
 <main>
-    <section>
-        <h2>📊 Surveillance des Actifs</h2>
-        <div id="markets">
-            <p>Initialisation de la liaison satellite en cours...</p>
-        </div>
-    </section>
+    <section id="markets">
+        </section>
 
-    <section id="signals-section">
-        <h2>📡 Flux de Signaux</h2>
+    <section id="signals">
+        <h3>📡 DERNIERS SIGNAUX</h3>
         <ul id="signalList"></ul>
     </section>
 </main>
 
+<div id="chat-container">
+    <div id="chat-display"></div>
+    <div id="chat-input-area">
+        <input type="text" id="user-input" placeholder="Parler à O.M.A.R...">
+        <button id="send-btn">➤</button>
+    </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
 <script src="app.js"></script>
-
 </body>
 </html>
