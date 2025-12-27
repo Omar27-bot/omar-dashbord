@@ -1,22 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>O.M.A.R | Mobile Sovereign Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; style-src * 'unsafe-inline';">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>🛡️ O.M.A.R</h1>
+    <span id="status">● SYSTEM ONLINE</span>
+</header>
+
 <main>
     <section id="critical-alerts">
         <h2 class="section-title">🚨 ALERTES IMPORTANTES</h2>
         <div id="alert-container">
-            <p class="no-alert">Aucune menace immédiate détectée, Monsieur.</p>
+            <p class="no-alert">Analyse des risques en cours, Monsieur...</p>
         </div>
     </section>
 
-    <section id="markets">
-        <h2 class="section-title">📊 MARCHÉS</h2>
-        <div id="markets-grid"></div>
+    <section>
+        <h2 class="section-title">📊 SURVEILLANCE DES ACTIFS</h2>
+        <div id="markets">
+            <p>Chargement du flux satellite...</p>
+        </div>
     </section>
 </main>
 
-<div id="chat-container" class="chat-expanded">
+<div id="chat-container">
     <div id="chat-header">🏛️ ANALYSES MACROÉCONOMIQUES</div>
-    <div id="chat-display"></div>
+    <div id="chat-display">
+        <div class="bot-msg">Prêt pour vos analyses de marché, Monsieur. Que souhaitez-vous approfondir aujourd'hui ?</div>
+    </div>
     <div id="chat-input-area">
-        <input type="text" id="user-input" placeholder="Demander une analyse macro...">
+        <input type="text" id="user-input" placeholder="Ordre d'analyse macro...">
         <button id="send-btn">ENVOYER</button>
     </div>
 </div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
