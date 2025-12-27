@@ -27,3 +27,12 @@ db.ref("signals").limitToLast(10).on("child_added", snap => {
     `<li class="signal">🌊 ${s.symbole} – RSI ${s.rsi}</li>` +
     document.getElementById("signalList").innerHTML;
 });
+// On écoute le dossier 'trading' créé par le script Python
+database.ref('trading/markets').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        console.log("Données reçues, Monsieur !");
+        // Votre fonction pour mettre à jour l'affichage
+        afficherMarches(data); 
+    }
+});
