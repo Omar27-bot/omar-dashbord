@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  background: #0b0e14;
+  color: #e0e0e0;
+  font-family: system-ui;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  background: #151921;
+}
+
+#status {
+  color: #00ff88;
+}
+
+section {
+  padding: 16px;
+}
+
+.card {
+  background: #151921;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.signal {
+  color: #00ff41;
+  font-weight: bold;
+}
