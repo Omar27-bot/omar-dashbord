@@ -32,9 +32,15 @@ const sendBtn = document.getElementById("send-btn");
 const userInput = document.getElementById("user-input");
 const chatDisplay = document.getElementById("chat-display");
 
-function sendMessage() {
-    const text = userInput.value;
-    if (!text) return;
+// On écoute les réponses aux questions
+database.ref('chat/questions').limitToLast(1).on('child_changed', (snap) => {
+    const data = snap.val();
+    if (data.reponse) {
+        const chatDisplay = document.getElementById("chat-display");
+        chatDisplay.innerHTML += `<div style="color: #00ff88;"><b>O.M.A.R:</b> ${data.reponse}</div>`;
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    }
+});
 
     chatDisplay.innerHTML += `<div><b>Monsieur:</b> ${text}</div>`;
     
