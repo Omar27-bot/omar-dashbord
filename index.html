@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>O.M.A.R. Mobile | Apex</title>
+    <title>O.M.A.R. Mobile | Apex Sovereign</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="hud-container">
         <header>
-            <div id="status-bar">● NEXUS CLOUD : ACTIVE</div>
-            <div id="clock">Lundi 29 Décembre 2025 | 21:50</div>
+            <div id="status-bar">● NEXUS CLOUD : OPÉRATIONNEL</div>
+            <div id="clock">Lundi 29 Décembre 2025 | 22:05</div>
         </header>
 
         <section class="chart-section">
-            <canvas id="portfolioChart"></canvas>
+            <div class="chart-wrapper">
+                <canvas id="portfolioChart"></canvas>
+                <div class="chart-center">EMPIRE</div>
+            </div>
         </section>
 
         <section class="console-section">
             <div id="chat-history">
-                <p class="system-msg"><b>[SYSTEME]</b> Visage Mobile synchronisé. Bienvenue, Monsieur.</p>
+                <p class="system-msg"><b>[SYSTEME]</b> Liaison mobile établie. O.M.A.R. est à vos ordres, Monsieur.</p>
             </div>
             <div class="input-area">
-                <input type="text" id="user-input" placeholder="Ordonnez à O.M.A.R...">
+                <input type="text" id="user-input" placeholder="Ordonnez, Monsieur...">
                 <button id="send-btn">OR</button>
             </div>
         </section>
@@ -31,13 +34,15 @@
         <section class="watchlist-section">
             <h3>WATCHLIST SOUVERAINE</h3>
             <ul id="asset-list">
-                <li onclick="analyze('XRP-CAD')">XRP-CAD <span>ANALYSE ACTIVE</span></li>
-                <li onclick="analyze('BTC-CAD')">BTC-CAD <span>ANALYSE ACTIVE</span></li>
-                <li onclick="analyze('SHOP.TO')">SHOP.TO <span>ANALYSE ACTIVE</span></li>
-                <li onclick="analyze('VFV.TO')">VFV.TO <span>ANALYSE ACTIVE</span></li>
+                <li onclick="analyze('XRP-CAD')">XRP-CAD <span>ANALYSE FLASH</span></li>
+                <li onclick="analyze('BTC-CAD')">BTC-CAD <span>ANALYSE FLASH</span></li>
+                <li onclick="analyze('ETH-CAD')">ETH-CAD <span>ANALYSE FLASH</span></li>
+                <li onclick="analyze('SHOP.TO')">SHOP.TO <span>ANALYSE FLASH</span></li>
+                <li onclick="analyze('VFV.TO')">VFV.TO <span>ANALYSE FLASH</span></li>
             </ul>
         </section>
     </div>
-    <script src="app.js"></script>
+
+    <script type="module" src="app.js"></script>
 </body>
 </html>
