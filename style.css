@@ -1,62 +1,91 @@
+/* Palette de l'Empire */
 :root {
     --gold: #D4AF37;
     --dark-gold: #AA8A2E;
     --black: #050505;
     --soft-black: #0A0A0A;
+    --white: #FFFFFF;
 }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body, html {
     margin: 0; padding: 0;
     background-color: var(--black);
     color: var(--gold);
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    height: 100%; overflow: hidden;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100vh; width: 100vw;
+    overflow: hidden;
 }
 
 .hud-container {
     display: flex; flex-direction: column;
-    height: 100vh; padding: 15px; box-sizing: border-box;
+    height: 100vh; padding: 20px;
 }
 
+/* En-tête */
 header {
-    text-align: center; border-bottom: 1px solid var(--gold);
-    padding-bottom: 10px; margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
 }
+#status-bar { font-size: 0.65rem; letter-spacing: 3px; font-weight: bold; }
+#clock { font-size: 0.85rem; color: var(--white); margin-top: 5px; opacity: 0.8; }
 
-#status-bar { font-size: 0.7rem; letter-spacing: 2px; }
-#clock { font-size: 0.9rem; font-weight: bold; margin-top: 5px; }
-
+/* Graphique */
 .chart-section {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    max-height: 30vh;
+    flex: 1; min-height: 200px;
+    display: flex; align-items: center; justify-content: center;
+}
+.chart-wrapper { position: relative; width: 180px; height: 180px; }
+.chart-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold; font-size: 0.9rem; letter-spacing: 2px;
 }
 
+/* Console de Chat */
 .console-section {
-    flex: 1.5; display: flex; flex-direction: column;
-    background: var(--soft-black); border: 1px solid var(--gold);
-    border-radius: 10px; margin: 15px 0; padding: 10px;
+    flex: 2; display: flex; flex-direction: column;
+    background: var(--soft-black);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 12px; margin-bottom: 15px;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
 }
-
 #chat-history {
-    flex: 1; overflow-y: auto; font-family: 'Courier New', monospace;
-    font-size: 0.85rem; padding-bottom: 10px;
+    flex: 1; overflow-y: auto;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.85rem; padding-right: 5px;
 }
+#chat-history p { margin: 8px 0; border-left: 2px solid var(--dark-gold); padding-left: 8px; }
 
-.input-area { display: flex; gap: 10px; border-top: 1px solid #222; padding-top: 10px; }
+/* Entrée de commande */
+.input-area { display: flex; gap: 8px; margin-top: 10px; }
 input {
-    flex: 1; background: transparent; border: 1px solid var(--gold);
-    color: white; padding: 10px; border-radius: 5px;
+    flex: 1; background: #000; border: 1px solid var(--dark-gold);
+    color: var(--white); padding: 12px; border-radius: 8px;
+    outline: none; font-size: 1rem;
 }
-
 button {
-    background: var(--gold); border: none; color: black;
-    font-weight: bold; padding: 0 15px; border-radius: 5px;
+    background: var(--gold); color: #000; border: none;
+    font-weight: bold; padding: 0 20px; border-radius: 8px;
+    transition: transform 0.1s;
 }
+button:active { transform: scale(0.95); background: var(--dark-gold); }
 
-.watchlist-section h3 { font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 5px; }
-ul { list-style: none; padding: 0; overflow-y: auto; max-height: 25vh; }
+/* Watchlist */
+.watchlist-section h3 { font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px; opacity: 0.7; }
+ul { list-style: none; padding: 0; margin: 0; overflow-y: auto; max-height: 150px; }
 li {
-    padding: 12px; border-bottom: 1px solid #111;
-    display: flex; justify-content: space-between; font-size: 0.9rem;
+    padding: 15px 0; border-bottom: 1px solid #1a1a1a;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.9rem; font-weight: bold;
 }
-li span { font-size: 0.7rem; color: var(--dark-gold); }
+li span { font-size: 0.65rem; color: var(--dark-gold); border: 1px solid var(--dark-gold); padding: 2px 6px; border-radius: 4px; }
+li:active { background: #111; }
+
+/* Scrollbar discrète */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--dark-gold); }
