@@ -2,47 +2,42 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>O.M.A.R | Mobile Sovereign Hub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; style-src * 'unsafe-inline';">
+    <title>O.M.A.R. Mobile | Apex</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <div class="hud-container">
+        <header>
+            <div id="status-bar">● NEXUS CLOUD : ACTIVE</div>
+            <div id="clock">Lundi 29 Décembre 2025 | 21:50</div>
+        </header>
 
-<header>
-    <h1>🛡️ O.M.A.R</h1>
-    <span id="status">● SYSTEM ONLINE</span>
-</header>
+        <section class="chart-section">
+            <canvas id="portfolioChart"></canvas>
+        </section>
 
-<main>
-    <section id="critical-alerts">
-        <h2 class="section-title">🚨 ALERTES IMPORTANTES</h2>
-        <div id="alert-container">
-            <p class="no-alert">Analyse des risques en cours, Monsieur...</p>
-        </div>
-    </section>
+        <section class="console-section">
+            <div id="chat-history">
+                <p class="system-msg"><b>[SYSTEME]</b> Visage Mobile synchronisé. Bienvenue, Monsieur.</p>
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Ordonnez à O.M.A.R...">
+                <button id="send-btn">OR</button>
+            </div>
+        </section>
 
-    <section>
-        <h2 class="section-title">📊 SURVEILLANCE DES ACTIFS</h2>
-        <div id="markets">
-            <p>Chargement du flux satellite...</p>
-        </div>
-    </section>
-</main>
-
-<div id="chat-container">
-    <div id="chat-header">🏛️ ANALYSES MACROÉCONOMIQUES</div>
-    <div id="chat-display">
-        <div class="bot-msg">Prêt pour vos analyses de marché, Monsieur. Que souhaitez-vous approfondir aujourd'hui ?</div>
+        <section class="watchlist-section">
+            <h3>WATCHLIST SOUVERAINE</h3>
+            <ul id="asset-list">
+                <li onclick="analyze('XRP-CAD')">XRP-CAD <span>ANALYSE ACTIVE</span></li>
+                <li onclick="analyze('BTC-CAD')">BTC-CAD <span>ANALYSE ACTIVE</span></li>
+                <li onclick="analyze('SHOP.TO')">SHOP.TO <span>ANALYSE ACTIVE</span></li>
+                <li onclick="analyze('VFV.TO')">VFV.TO <span>ANALYSE ACTIVE</span></li>
+            </ul>
+        </section>
     </div>
-    <div id="chat-input-area">
-        <input type="text" id="user-input" placeholder="Ordre d'analyse macro...">
-        <button id="send-btn">ENVOYER</button>
-    </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
