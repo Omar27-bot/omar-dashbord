@@ -17,22 +17,37 @@ import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebas
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// --- GESTION DU GRAPHIQUE (CHART.JS) ---
+// --- MISE À JOUR SOUVERAINE DU PORTFOLIO (31 Déc. 2025) ---
 const ctx = document.getElementById('portfolioChart').getContext('2d');
-// Mise à jour des segments du portefeuille de Monsieur
+
+// Calcul des valeurs exactes fournies par Monsieur
+const valActions = 630.93; // Somme de CVS, FSLR, GOOGL, HCLN, MSFT, SHOP, UNH, VBAL, VFV, XBAL
+const valCrypto  = 342.69; // Somme de BTC, ETH, XRP
+const valCash    = 35.47;  // Liquidités
+
 const portfolioChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
-        labels: ['Actions/FNB', 'Crypto', 'Cash'],
+        labels: ['Actions & FNB', 'Cryptomonnaies', 'Liquidités'],
         datasets: [{
-            data: [630.93, 342.69, 35.47], // Vos chiffres exacts
-            backgroundColor: ['#D4AF37', '#AA8A2E', '#634F18'],
+            data: [valActions, valCrypto, valCash],
+            backgroundColor: ['#D4AF37', '#AA8A2E', '#634F18'], // Or, Or Sombre, Bronze
             borderColor: '#050505',
             borderWidth: 2
         }]
     },
-    // ... reste de la configuration
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false } // Nous gardons l'esthétique épurée
+        },
+        cutout: '75%' // Pour l'effet anneau "Apex"
+    }
 });
+
+// Mise à jour du texte central du HUD
+document.querySelector('.chart-center').innerHTML = "1009.09$<br><span style='font-size:0.6rem; opacity:0.6;'>TOTAL INVESTI</span>";
 
 // --- ÉLÉMENTS DE L'INTERFACE ---
 const input = document.getElementById('user-input');
