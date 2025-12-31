@@ -19,22 +19,19 @@ const db = getDatabase(app);
 
 // --- GESTION DU GRAPHIQUE (CHART.JS) ---
 const ctx = document.getElementById('portfolioChart').getContext('2d');
+// Mise à jour des segments du portefeuille de Monsieur
 const portfolioChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
-        labels: ['Crypto', 'Actions', 'Immo', 'Cash'],
+        labels: ['Actions/FNB', 'Crypto', 'Cash'],
         datasets: [{
-            data: [45, 35, 12, 8],
-            backgroundColor: ['#D4AF37', '#AA8A2E', '#856A20', '#634F18'],
+            data: [630.93, 342.69, 35.47], // Vos chiffres exacts
+            backgroundColor: ['#D4AF37', '#AA8A2E', '#634F18'],
             borderColor: '#050505',
             borderWidth: 2
         }]
     },
-    options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        cutout: '70%'
-    }
+    // ... reste de la configuration
 });
 
 // --- ÉLÉMENTS DE L'INTERFACE ---
