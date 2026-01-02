@@ -3,46 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>O.M.A.R. Mobile | Apex Sovereign</title>
-    <link rel="stylesheet" href="style.css">
+    <title>O.M.A.R. | ZENITH MOBILE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="hud-container">
+    <div id="app">
         <header>
-            <div id="status-bar">● NEXUS CLOUD : OPÉRATIONNEL</div>
-            <div id="clock">Lundi 29 Décembre 2025 | 22:05</div>
+            <div class="status-bar">
+                <span id="system-title">🔱 O.M.A.R. // ZENITH MOBILE</span>
+                <span id="clock">00:00:00</span>
+            </div>
+            <div class="net-worth-display">
+                <small>VALEUR TOTALE DU PORTEFEUILLE</small>
+                <h1 id="total-wealth">0.00 CAD</h1>
+            </div>
         </header>
 
-        <section class="chart-section">
-            <div class="chart-wrapper">
-                <canvas id="portfolioChart"></canvas>
-                <div class="chart-center">EMPIRE</div>
-            </div>
-        </section>
-
-        <section class="console-section">
-            <div id="chat-history">
-                <p class="system-msg"><b>[SYSTEME]</b> Liaison mobile établie. O.M.A.R. est à vos ordres, Monsieur.</p>
-            </div>
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="Ordonnez, Monsieur...">
-                <button id="send-btn">OR</button>
-            </div>
+        <section class="chart-container">
+            <canvas id="portfolioChart"></canvas>
         </section>
 
         <section class="watchlist-section">
-            <h3>WATCHLIST SOUVERAINE</h3>
-            <ul id="asset-list">
-                <li onclick="analyze('XRP-CAD')">XRP-CAD <span>ANALYSE FLASH</span></li>
-                <li onclick="analyze('BTC-CAD')">BTC-CAD <span>ANALYSE FLASH</span></li>
-                <li onclick="analyze('ETH-CAD')">ETH-CAD <span>ANALYSE FLASH</span></li>
-                <li onclick="analyze('SHOP.TO')">SHOP.TO <span>ANALYSE FLASH</span></li>
-                <li onclick="analyze('VFV.TO')">VFV.TO <span>ANALYSE FLASH</span></li>
-            </ul>
+            <h3>📊 PORTEFEUILLE DE MONSIEUR</h3>
+            <div id="watchlist-container">
+                </div>
+        </section>
+
+        <section class="console-section">
+            <div id="console-log">
+                <p><strong>[SYSTEM]</strong> O.M.A.R Mobile prêt, Monsieur.</p>
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Parlez à votre majordome...">
+                <button id="send-btn">Envoyer</button>
+            </div>
         </section>
     </div>
-
-    <script type="module" src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
