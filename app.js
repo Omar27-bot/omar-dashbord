@@ -83,18 +83,16 @@ function listen(path, callback) {
 }
 
 // ALERTES
-listen("signals", data => {
-  const list = document.getElementById("alertsList");
-  list.innerHTML = "";
-  if (!data) return;
-  Object.values(data).forEach(a => {
-    list.innerHTML += `
-      <div class="card">
-        <strong>${a.title || "Alerte"}</strong><br>
-        ${a.message || ""}
-      </div>`;
-  });
+Object.values(data).forEach(a => {
+  if (!a || (!a.title && !a.message)) return; // ignore les alertes vides
+
+  list.innerHTML += `
+    <div class="card">
+      <strong>${a.title}</strong><br>
+      ${a.message || ""}
+    </div>`;
 });
+
 
 // WATCHLIST
 listen("status", data => {
