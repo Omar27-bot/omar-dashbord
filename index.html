@@ -1,45 +1,94 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>O.M.A.R. | ZENITH MOBILE</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>O.M.A.R — HUD Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="app">
-        <header>
-            <div class="status-bar">
-                <span id="system-title">🔱 O.M.A.R. // ZENITH MOBILE</span>
-                <span id="clock">00:00:00</span>
-            </div>
-            <div class="net-worth-display">
-                <small>VALEUR TOTALE DU PORTEFEUILLE</small>
-                <h1 id="total-wealth">0.00 CAD</h1>
-            </div>
-        </header>
+  <div id="app">
+    <header class="app-header">
+      <div class="title-block">
+        <span class="logo">🔱</span>
+        <div>
+          <h1>O.M.A.R</h1>
+          <p>HUD Mobile — Lecture seule</p>
+        </div>
+      </div>
+      <div class="status-pill" id="connectionStatus">Connexion…</div>
+    </header>
 
-        <section class="chart-container">
-            <canvas id="portfolioChart"></canvas>
-        </section>
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="alerts">Alertes</button>
+      <button class="tab-button" data-tab="watchlist">Actifs</button>
+      <button class="tab-button" data-tab="reports">Rapports</button>
+      <button class="tab-button" data-tab="agents">Agents</button>
+      <button class="tab-button" data-tab="chat">Parler à O.M.A.R</button>
+    </nav>
 
-        <section class="watchlist-section">
-            <h3>📊 PORTEFEUILLE DE MONSIEUR</h3>
-            <div id="watchlist-container">
-                </div>
-        </section>
+    <main class="tab-content">
+      <!-- ALERTES -->
+      <section id="tab-alerts" class="tab-panel active">
+        <h2>Alertes critiques & importantes</h2>
+        <div id="alertsList" class="card-list">
+          <p class="placeholder">Chargement des alertes…</p>
+        </div>
+      </section>
 
-        <section class="console-section">
-            <div id="console-log">
-                <p><strong>[SYSTEM]</strong> O.M.A.R Mobile prêt, Monsieur.</p>
+      <!-- WATCHLIST -->
+      <section id="tab-watchlist" class="tab-panel">
+        <h2>Actifs à surveiller</h2>
+        <div id="watchlistSummary" class="summary-bar">
+          Valeur totale: <span id="portfolioValue">—</span>
+        </div>
+        <div id="watchlistList" class="card-list">
+          <p class="placeholder">Chargement des actifs…</p>
+        </div>
+      </section>
+
+      <!-- RAPPORTS -->
+      <section id="tab-reports" class="tab-panel">
+        <h2>Rapport de la journée</h2>
+        <article id="dailyReport" class="report-card">
+          <p class="placeholder">En attente du rapport journalier…</p>
+        </article>
+        <h3>Historique des rapports</h3>
+        <div id="reportsHistory" class="card-list"></div>
+      </section>
+
+      <!-- AGENTS -->
+      <section id="tab-agents" class="tab-panel">
+        <h2>Résultats des agents</h2>
+        <div id="agentsResults" class="card-list">
+          <p class="placeholder">En attente des rapports des agents…</p>
+        </div>
+      </section>
+
+      <!-- CHAT -->
+      <section id="tab-chat" class="tab-panel">
+        <h2>Parler à O.M.A.R</h2>
+        <div id="chatWindow" class="chat-window">
+          <div class="chat-message system">
+            <div class="chat-author">O.M.A.R</div>
+            <div class="chat-text">
+              Monsieur, je suis à votre disposition. Vous pouvez m’écrire ci‑dessous.
             </div>
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="Parlez à votre majordome...">
-                <button id="send-btn">Envoyer</button>
-            </div>
-        </section>
-    </div>
-    <script src="app.js"></script>
+          </div>
+        </div>
+        <form id="chatForm" class="chat-input-bar">
+          <input
+            type="text"
+            id="chatInput"
+            placeholder="Parlez à O.M.A.R…"
+            autocomplete="off"
+          />
+          <button type="submit">Envoyer</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
