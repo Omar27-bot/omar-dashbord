@@ -49,7 +49,7 @@ function appendChat(author, text, isUser = false) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// ENVOI CHAT MOBILE → /commandes/mobile_chat
+// ENVOI CHAT MOBILE
 if (chatForm && chatInput) {
   chatForm.addEventListener("submit", e => {
     e.preventDefault();
@@ -67,7 +67,7 @@ if (chatForm && chatInput) {
   });
 }
 
-// FONCTION GÉNÉRIQUE D’ÉCOUTE
+// LISTENER GÉNÉRIQUE
 function listen(path, callback) {
   const r = ref(db, path);
   onValue(
@@ -96,7 +96,7 @@ listen("signals", data => {
   });
 });
 
-// WATCHLIST / PORTEFEUILLE
+// WATCHLIST
 listen("status", data => {
   const list = document.getElementById("watchlistList");
   const total = document.getElementById("portfolioValue");
@@ -142,7 +142,7 @@ listen("system/reports_history", data => {
   });
 });
 
-// RÉSULTATS AGENTS
+// AGENTS
 listen("nexus/agents", data => {
   const list = document.getElementById("agentsResults");
   list.innerHTML = "";
@@ -156,7 +156,7 @@ listen("nexus/agents", data => {
   });
 });
 
-// CHAT COMPLET (flux /chat)
+// CHAT COMPLET
 listen("chat", data => {
   if (!chatWindow) return;
   chatWindow.innerHTML = "";
