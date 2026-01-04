@@ -1,13 +1,37 @@
-// Adresse de ton HUD sur le réseau local (à adapter)
-// Exemple : "http://192.168.0.10:5000"
-const BASE_URL = "http://192.168.0.10:5000";
+// app.js — OMAR HUD Mobile + Firebase Realtime Database (module ES)
 
-// Sélecteurs de base
+// Import Firebase SDK (version modulaire)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+// --- CONFIGURATION FIREBASE OMAR-SYSTEM ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCc7P7swrV4oXeOxMhFRZScIGmFB-gfkvg",
+  authDomain: "omar-system.firebaseapp.com",
+  databaseURL: "https://omar-system-default-rtdb.firebaseio.com",
+  projectId: "omar-system",
+  storageBucket: "omar-system.firebasestorage.app",
+  messagingSenderId: "571385162146",
+  appId: "1:571385162146:web:6763c7f74f02fc0f2ceafb",
+  measurementId: "G-8KMSZ5DVSS"
+};
+
+// Initialisation Firebase
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const db = getDatabase(app);
+
+// Sélecteurs UI
 const statusEl = document.getElementById("connectionStatus");
 const tabButtons = document.querySelectorAll(".tab-button");
 const tabPanels = document.querySelectorAll(".tab-panel");
 
-// Sections
 const alertsList = document.getElementById("alertsList");
 const watchlistList = document.getElementById("watchlistList");
 const portfolioValueEl = document.getElementById("portfolioValue");
@@ -15,53 +39,37 @@ const dailyReportEl = document.getElementById("dailyReport");
 const reportsHistoryEl = document.getElementById("reportsHistory");
 const agentsResultsEl = document.getElementById("agentsResults");
 
-// Chat
 const chatWindow = document.getElementById("chatWindow");
 const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
 
-// Gestion des tabs
+// Gestion des onglets
 tabButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const target = btn.dataset.tab;
-
     tabButtons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
-
     tabPanels.forEach((panel) => {
       panel.classList.toggle("active", panel.id === `tab-${target}`);
     });
   });
 });
 
-// Utilitaires
 function setStatus(text, ok = true) {
   statusEl.textContent = text;
   statusEl.style.color = ok ? "#00c853" : "#ff4b4b";
 }
 
-async function fetchJSON(path) {
-  try {
-    const res = await fetch(`${BASE_URL}${path}`, { cache: "no-store" });
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    setStatus("Connecté", true);
-    return data;
-  } catch (e) {
-    setStatus("Hors ligne", false);
-    throw e;
-  }
-}
+// --- RENDUS UI ---
 
-// Rendu des alertes
-function renderAlerts(data) {
+function renderAlerts(dataArr) {
   alertsList.innerHTML = "";
-  if (!data || data.length === 0) {
+  if (!dataArr || dataArr.length === 0) {
     alertsList.innerHTML = `<p class="placeholder">Aucune alerte active.</p>`;
     return;
   }
 
-  data.forEach((alert) => {
+  dataArr.forEach((alert) => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -70,20 +78,21 @@ function renderAlerts(data) {
 
     const title = document.createElement("div");
     title.className = "card-title";
-    title.textContent = alert.title || "Alerte";
+    title.textContent = alert.title || alert.label || "Alerte";
 
     const tag = document.createElement("div");
     tag.className = "card-tag";
-    if (alert.level === "CRITICAL") tag.classList.add("danger");
-    if (alert.level === "INFO") tag.classList.add("ok");
-    tag.textContent = alert.level || "ALERTE";
+    const level = (alert.level || alert.severity || "ALERTE").toUpperCase();
+    if (level.includes("CRIT")) tag.classList.add("danger");
+    if (level.includes("INFO") || level.includes("OK")) tag.classList.add("ok");
+    tag.textContent = level;
 
     header.appendChild(title);
     header.appendChild(tag);
 
     const body = document.createElement("div");
     body.className = "card-body";
-    body.textContent = alert.message || "";
+    body.textContent = alert.message || alert.details || "";
 
     card.appendChild(header);
     card.appendChild(body);
@@ -91,21 +100,30 @@ function renderAlerts(data) {
   });
 }
 
-// Rendu watchlist
-function renderWatchlist(data) {
+function renderWatchlist(statusData) {
   watchlistList.innerHTML = "";
-  if (!data || !data.assets || data.assets.length === 0) {
+
+  // Structure attendue (à adapter côté PC) :
+  // {
+  //   total_value: number,
+  //   assets: {
+  //      "BTC-CAD": { value, pl, pl_pct, weight },
+  //      ...
+  //   }
+  // }
+
+  if (!statusData || !statusData.assets) {
     watchlistList.innerHTML = `<p class="placeholder">Aucun actif à surveiller.</p>`;
     portfolioValueEl.textContent = "—";
     return;
   }
 
-  portfolioValueEl.textContent = (data.total_value || 0).toLocaleString("fr-CA", {
-    style: "currency",
-    currency: "CAD",
-  });
+  const total = statusData.total_value || 0;
+  portfolioValueEl.textContent = total
+    ? total.toLocaleString("fr-CA", { style: "currency", currency: "CAD" })
+    : "—";
 
-  data.assets.forEach((asset) => {
+  Object.entries(statusData.assets).forEach(([symbol, asset]) => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -114,20 +132,24 @@ function renderWatchlist(data) {
 
     const title = document.createElement("div");
     title.className = "card-title";
-    title.textContent = asset.symbol || "—";
+    title.textContent = symbol;
 
     const tag = document.createElement("div");
     tag.className = "card-tag";
-    tag.textContent = asset.weight ? `${asset.weight.toFixed(1)} %` : "—";
+    if (asset.weight != null) {
+      tag.textContent = `${Number(asset.weight).toFixed(1)} %`;
+    } else {
+      tag.textContent = "—";
+    }
 
     header.appendChild(title);
     header.appendChild(tag);
 
     const body = document.createElement("div");
     body.className = "card-body";
-    const value = asset.value || 0;
-    const pl = asset.pl || 0;
-    const plPct = asset.pl_pct || 0;
+    const value = Number(asset.value || 0);
+    const pl = Number(asset.pl || 0);
+    const plPct = Number(asset.pl_pct || 0);
 
     body.innerHTML = `
       Valeur: ${value.toLocaleString("fr-CA", { style: "currency", currency: "CAD" })}<br/>
@@ -140,29 +162,31 @@ function renderWatchlist(data) {
   });
 }
 
-// Rendu rapport du jour
-function renderDailyReport(data) {
-  if (!data || !data.text) {
+function renderDailyReport(rep) {
+  if (!rep || !rep.text) {
     dailyReportEl.innerHTML = `<p class="placeholder">En attente du rapport journalier généré par O.M.A.R.</p>`;
     return;
   }
 
+  const day = rep.day || "—";
+  const time = rep.time || "—";
+  const text = rep.text;
+
   dailyReportEl.innerHTML = `
-    <strong>Jour :</strong> ${data.day || "—"}<br/>
-    <strong>Heure :</strong> ${data.time || "—"}<br/><br/>
-    <pre style="white-space: pre-wrap; margin: 0;">${data.text}</pre>
+    <strong>Jour :</strong> ${day}<br/>
+    <strong>Heure :</strong> ${time}<br/><br/>
+    <pre style="white-space: pre-wrap; margin: 0;">${text}</pre>
   `;
 }
 
-// Rendu historique rapports
-function renderReportsHistory(data) {
+function renderReportsHistory(list) {
   reportsHistoryEl.innerHTML = "";
-  if (!data || data.length === 0) {
+  if (!list || list.length === 0) {
     reportsHistoryEl.innerHTML = `<p class="placeholder">Aucun rapport historique disponible.</p>`;
     return;
   }
 
-  data.forEach((rep) => {
+  list.forEach((rep) => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -182,7 +206,8 @@ function renderReportsHistory(data) {
 
     const body = document.createElement("div");
     body.className = "card-body";
-    body.textContent = (rep.summary || "").slice(0, 140) + "…";
+    const summary = rep.summary || rep.text || "";
+    body.textContent = summary.length > 160 ? summary.slice(0, 157) + "…" : summary;
 
     card.appendChild(header);
     card.appendChild(body);
@@ -190,15 +215,14 @@ function renderReportsHistory(data) {
   });
 }
 
-// Rendu résultats agents
-function renderAgents(data) {
+function renderAgents(list) {
   agentsResultsEl.innerHTML = "";
-  if (!data || data.length === 0) {
+  if (!list || list.length === 0) {
     agentsResultsEl.innerHTML = `<p class="placeholder">Aucun résultat récent des agents.</p>`;
     return;
   }
 
-  data.forEach((entry) => {
+  list.forEach((entry) => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -207,7 +231,7 @@ function renderAgents(data) {
 
     const title = document.createElement("div");
     title.className = "card-title";
-    title.textContent = entry.agent || "Agent";
+    title.textContent = entry.agent || entry.name || "Agent";
 
     const tag = document.createElement("div");
     tag.className = "card-tag";
@@ -218,7 +242,7 @@ function renderAgents(data) {
 
     const body = document.createElement("div");
     body.className = "card-body";
-    body.textContent = entry.result || "";
+    body.textContent = entry.result || entry.details || "";
 
     card.appendChild(header);
     card.appendChild(body);
@@ -226,7 +250,8 @@ function renderAgents(data) {
   });
 }
 
-// Chat
+// --- CHAT ---
+
 function appendChatMessage(author, text, isUser = false) {
   const msg = document.createElement("div");
   msg.className = "chat-message " + (isUser ? "user" : "system");
@@ -245,49 +270,108 @@ function appendChatMessage(author, text, isUser = false) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-chatForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const text = chatInput.value.trim();
-  if (!text) return;
-
-  appendChatMessage("Monsieur", text, true);
-  chatInput.value = "";
-
-  try {
-    const res = await fetch(`${BASE_URL}/api/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text }),
-    });
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    appendChatMessage("O.M.A.R", data.reply || "Réponse indisponible.");
-  } catch (e) {
-    appendChatMessage("O.M.A.R", "Monsieur, je ne parviens pas à joindre le HUD.");
+function updateChatWindow(messages) {
+  // messages = [{from, text, timestamp, reply?}, ...]
+  chatWindow.innerHTML = "";
+  if (!messages || messages.length === 0) {
+    appendChatMessage(
+      "O.M.A.R",
+      "Monsieur, je suis à votre disposition. Vous pouvez m’écrire ci‑dessous."
+    );
+    return;
   }
-});
 
-// Rafraîchissement périodique
-async function refreshAll() {
+  messages
+    .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+    .forEach((m) => {
+      const isUser = m.from === "monsieur" || m.from === "mobile";
+      const author = isUser ? "Monsieur" : "O.M.A.R";
+      appendChatMessage(author, m.text || "", isUser);
+      if (m.reply) {
+        appendChatMessage("O.M.A.R", m.reply, false);
+      }
+    });
+}
+
+async function sendMessageToOmar(text) {
+  const msg = {
+    from: "mobile",
+    text: text,
+    timestamp: Date.now()
+  };
   try {
-    const [alerts, watchlist, daily, history, agents] = await Promise.all([
-      fetchJSON("/api/alerts"),
-      fetchJSON("/api/watchlist"),
-      fetchJSON("/api/daily-report"),
-      fetchJSON("/api/reports-history"),
-      fetchJSON("/api/agents-results"),
-    ]);
-
-    renderAlerts(alerts);
-    renderWatchlist(watchlist);
-    renderDailyReport(daily);
-    renderReportsHistory(history);
-    renderAgents(agents);
+    await push(ref(db, "commandes/mobile_chat"), msg);
   } catch (e) {
-    // status déjà géré dans fetchJSON
+    appendChatMessage("O.M.A.R", "Monsieur, la commande n’a pas pu être envoyée.", false);
   }
 }
 
-// Tick initial + intervalle
-refreshAll();
-setInterval(refreshAll, 15000);
+chatForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = chatInput.value.trim();
+  if (!text) return;
+  appendChatMessage("Monsieur", text, true);
+  chatInput.value = "";
+  sendMessageToOmar(text);
+});
+
+// --- ABONNEMENTS FIREBASE ---
+
+function safeOnValue(path, handler) {
+  const r = ref(db, path);
+  onValue(
+    r,
+    (snapshot) => {
+      setStatus("Connecté", true);
+      handler(snapshot.val());
+    },
+    (error) => {
+      console.error("Firebase error on", path, error);
+      setStatus("Hors ligne", false);
+    }
+  );
+}
+
+// signals : alertes
+safeOnValue("signals", (data) => {
+  const arr = data ? Object.values(data) : [];
+  renderAlerts(arr);
+});
+
+// status : portefeuille / actifs
+safeOnValue("status", (data) => {
+  renderWatchlist(data || {});
+});
+
+// system/daily_report : rapport du jour
+safeOnValue("system/daily_report", (data) => {
+  renderDailyReport(data || {});
+});
+
+// system/reports_history : historique
+safeOnValue("system/reports_history", (data) => {
+  const arr = data ? Object.values(data) : [];
+  renderReportsHistory(arr);
+});
+
+// nexus/agents : résultats des agents
+safeOnValue("nexus/agents", (data) => {
+  const arr = data ? Object.values(data) : [];
+  renderAgents(arr);
+});
+
+// chat : historique entre Monsieur et O.M.A.R
+safeOnValue("chat", (data) => {
+  const arr = data ? Object.values(data) : [];
+  updateChatWindow(arr);
+});
+
+// system_status : éventuellement, adapter le pill de statut
+safeOnValue("system_status", (data) => {
+  if (!data) return;
+  if (data.state === "OK") {
+    setStatus("Système nominal", true);
+  } else if (data.state) {
+    setStatus(data.state, false);
+  }
+});
