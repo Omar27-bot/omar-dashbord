@@ -3,11 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <title>O.M.A.R — HUD Mobile</title>
+
+  <!-- Optimisation mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Style -->
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div id="app">
+
+    <!-- HEADER -->
     <header class="app-header">
       <div class="title-block">
         <span class="logo">🔱</span>
@@ -19,6 +29,7 @@
       <div class="status-pill" id="connectionStatus">Connexion…</div>
     </header>
 
+    <!-- TABS -->
     <nav class="tabs">
       <button class="tab-button active" data-tab="alerts">Alertes</button>
       <button class="tab-button" data-tab="watchlist">Actifs</button>
@@ -27,7 +38,9 @@
       <button class="tab-button" data-tab="chat">Parler à O.M.A.R</button>
     </nav>
 
+    <!-- CONTENU -->
     <main class="tab-content">
+
       <!-- ALERTES -->
       <section id="tab-alerts" class="tab-panel active">
         <h2>Alertes critiques & importantes</h2>
@@ -53,6 +66,7 @@
         <article id="dailyReport" class="report-card">
           <p class="placeholder">En attente du rapport journalier…</p>
         </article>
+
         <h3>Historique des rapports</h3>
         <div id="reportsHistory" class="card-list"></div>
       </section>
@@ -68,7 +82,13 @@
       <!-- CHAT -->
       <section id="tab-chat" class="tab-panel">
         <h2>Parler à O.M.A.R</h2>
-        <div id="chatWindow" class="chat-window"></div>
+
+        <div id="chatWindow" class="chat-window">
+          <div class="chat-message system">
+            <strong>O.M.A.R</strong><br>
+            Monsieur, je suis à votre disposition. Vous pouvez m’écrire ci‑dessous.
+          </div>
+        </div>
 
         <form id="chatForm" class="chat-input-bar">
           <input
@@ -80,9 +100,19 @@
           <button type="submit">Envoyer</button>
         </form>
       </section>
+
     </main>
   </div>
 
+  <!-- APP JS -->
   <script type="module" src="app.js"></script>
+
+  <!-- Service Worker (PWA) -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
+
 </body>
 </html>
