@@ -1,7 +1,7 @@
 {
   "name": "O.M.A.R HUD Mobile",
   "short_name": "OMAR HUD",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#d4af37",
