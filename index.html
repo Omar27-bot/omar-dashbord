@@ -7,23 +7,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
   <!-- Icône O.M.A.R -->
-  <link rel="icon" type="image/jpeg" href="omar-logo-512.jpeg">
-  <link rel="apple-touch-icon" href="omar-logo-512.jpeg">
+  <link rel="icon" type="image/jpeg" href="/omar-dashbord/omar-logo-512.jpeg">
+  <link rel="apple-touch-icon" href="/omar-dashbord/omar-logo-512.jpeg">
 
   <!-- PWA manifest -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/omar-dashbord/manifest.json">
 
   <!-- Style principal -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/omar-dashbord/style.css" />
 </head>
 
 <body>
   <div id="app">
 
-    <!-- HEADER -->
     <header class="app-header">
       <div class="title-block">
-        <img src="omar-logo-512.jpeg" alt="O.M.A.R" style="height:32px; border-radius:6px;" />
+        <img src="/omar-dashbord/omar-logo-512.jpeg" alt="O.M.A.R" style="height:32px; border-radius:6px;" />
         <div>
           <h1>O.M.A.R</h1>
           <p>HUD Mobile — OMAR-SYSTEM</p>
@@ -32,7 +31,6 @@
       <div class="status-pill" id="connectionStatus">Connexion…</div>
     </header>
 
-    <!-- TABS -->
     <nav class="tabs">
       <button class="tab-button active" data-tab="alerts">Alertes</button>
       <button class="tab-button" data-tab="watchlist">Actifs</button>
@@ -41,10 +39,8 @@
       <button class="tab-button" data-tab="chat">Parler à O.M.A.R</button>
     </nav>
 
-    <!-- CONTENU PRINCIPAL -->
     <main class="tab-content">
 
-      <!-- ALERTES -->
       <section id="tab-alerts" class="tab-panel active">
         <h2>Alertes critiques & importantes</h2>
         <div id="alertsList" class="card-list">
@@ -52,7 +48,6 @@
         </div>
       </section>
 
-      <!-- WATCHLIST -->
       <section id="tab-watchlist" class="tab-panel">
         <h2>Actifs à surveiller</h2>
         <div class="summary-bar">
@@ -63,7 +58,6 @@
         </div>
       </section>
 
-      <!-- RAPPORTS -->
       <section id="tab-reports" class="tab-panel">
         <h2>Rapport de la journée</h2>
         <article id="dailyReport" class="report-card">
@@ -74,7 +68,6 @@
         <div id="reportsHistory" class="card-list"></div>
       </section>
 
-      <!-- AGENTS -->
       <section id="tab-agents" class="tab-panel">
         <h2>Résultats des agents</h2>
         <div id="agentsResults" class="card-list">
@@ -82,7 +75,6 @@
         </div>
       </section>
 
-      <!-- CHAT -->
       <section id="tab-chat" class="tab-panel">
         <h2>Parler à O.M.A.R</h2>
 
@@ -102,11 +94,11 @@
     </main>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <script type="module" src="/omar-dashbord/app.js"></script>
 
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js");
+      navigator.serviceWorker.register("/omar-dashbord/service-worker.js");
     }
   </script>
 
