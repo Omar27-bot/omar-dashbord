@@ -1,14 +1,14 @@
 {
   "name": "O.M.A.R HUD Mobile",
   "short_name": "OMAR HUD",
-  "start_url": "index.html",
+  "start_url": "/omar-dashbord/index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#d4af37",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "omar-logo-512.jpeg",
+      "src": "/omar-dashbord/omar-logo-512.jpeg",
       "sizes": "512x512",
       "type": "image/jpeg"
     }
