@@ -82,17 +82,24 @@ function listen(path, callback) {
   );
 }
 
-// ALERTES
-Object.values(data).forEach(a => {
-  if (!a || (!a.title && !a.message)) return; // ignore les alertes vides
+// 🔥 ALERTES (avec filtre anti-alertes vides)
+listen("signals", data => {
+  const list = document.getElementById("alertsList");
+  list.innerHTML = "";
 
-  list.innerHTML += `
-    <div class="card">
-      <strong>${a.title}</strong><br>
-      ${a.message || ""}
-    </div>`;
+  if (!data) return;
+
+  Object.values(data).forEach(a => {
+    // Ignore les alertes vides
+    if (!a || (!a.title && !a.message)) return;
+
+    list.innerHTML += `
+      <div class="card">
+        <strong>${a.title}</strong><br>
+        ${a.message || ""}
+      </div>`;
+  });
 });
-
 
 // WATCHLIST
 listen("status", data => {
