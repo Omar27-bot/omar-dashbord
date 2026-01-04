@@ -107,6 +107,30 @@ html, body {
   border: 1px solid var(--border);
 }
 
+.placeholder {
+  color: var(--fg-soft);
+  font-size: 13px;
+}
+
+/* SUMMARY BAR */
+.summary-bar {
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #080808;
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+
+/* REPORTS */
+.report-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
 /* CHAT */
 .chat-window {
   height: calc(100vh - 260px);
@@ -122,6 +146,7 @@ html, body {
   padding: 8px;
   border-radius: 6px;
   max-width: 85%;
+  font-size: 13px;
 }
 
 .chat-message.user {
@@ -159,4 +184,19 @@ html, body {
   background: linear-gradient(135deg, #f1c857, #d4af37);
   color: #000;
   font-weight: bold;
+  font-size: 13px;
+}
+
+/* PETITS ÉCRANS */
+@media (max-width: 400px) {
+  .app-header h1 {
+    font-size: 18px;
+  }
+  .app-header p {
+    font-size: 11px;
+  }
+  .tab-button {
+    font-size: 12px;
+    padding: 8px;
+  }
 }
