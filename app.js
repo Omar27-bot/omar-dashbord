@@ -40,7 +40,7 @@ function setStatus(text, ok = true) {
   statusEl.style.color = ok ? "#00c853" : "#ff4b4b";
 }
 
-// CHAT
+// CHAT UI
 function appendChat(author, text, isUser = false) {
   const msg = document.createElement("div");
   msg.className = "chat-message " + (isUser ? "user" : "system");
@@ -49,27 +49,37 @@ function appendChat(author, text, isUser = false) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-chatForm.addEventListener("submit", e => {
-  e.preventDefault();
-  const text = chatInput.value.trim();
-  if (!text) return;
+// ENVOI CHAT MOBILE → /commandes/mobile_chat
+if (chatForm && chatInput) {
+  chatForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const text = chatInput.value.trim();
+    if (!text) return;
 
-  appendChat("Monsieur", text, true);
-  chatInput.value = "";
+    appendChat("Monsieur", text, true);
+    chatInput.value = "";
 
-  push(ref(db, "commandes/mobile_chat"), {
-    from: "mobile",
-    text,
-    timestamp: Date.now()
+    push(ref(db, "commandes/mobile_chat"), {
+      from: "mobile",
+      text,
+      timestamp: Date.now()
+    });
   });
-});
+}
 
-// FIREBASE LISTENERS
+// FONCTION GÉNÉRIQUE D’ÉCOUTE
 function listen(path, callback) {
-  onValue(ref(db, path), snap => {
-    setStatus("Connecté", true);
-    callback(snap.val());
-  }, () => setStatus("Hors ligne", false));
+  const r = ref(db, path);
+  onValue(
+    r,
+    snap => {
+      setStatus("Connecté", true);
+      callback(snap.val());
+    },
+    () => {
+      setStatus("Hors ligne", false);
+    }
+  );
 }
 
 // ALERTES
@@ -78,18 +88,22 @@ listen("signals", data => {
   list.innerHTML = "";
   if (!data) return;
   Object.values(data).forEach(a => {
-    list.innerHTML += `<div class="card"><strong>${a.title}</strong><br>${a.message}</div>`;
+    list.innerHTML += `
+      <div class="card">
+        <strong>${a.title || "Alerte"}</strong><br>
+        ${a.message || ""}
+      </div>`;
   });
 });
 
-// WATCHLIST
+// WATCHLIST / PORTEFEUILLE
 listen("status", data => {
   const list = document.getElementById("watchlistList");
   const total = document.getElementById("portfolioValue");
   list.innerHTML = "";
   if (!data || !data.assets) return;
 
-  total.textContent = data.total_value || "—";
+  total.textContent = data.total_value ?? "—";
 
   Object.entries(data.assets).forEach(([sym, a]) => {
     list.innerHTML += `
@@ -104,35 +118,55 @@ listen("status", data => {
 // RAPPORT JOURNALIER
 listen("system/daily_report", data => {
   const rep = document.getElementById("dailyReport");
-  if (!data) return;
-  rep.innerHTML = `<strong>${data.day}</strong> — ${data.time}<br><br>${data.text}`;
+  if (!data) {
+    rep.innerHTML = `<p class="placeholder">En attente du rapport journalier…</p>`;
+    return;
+  }
+  rep.innerHTML = `
+    <strong>${data.day || ""}</strong> — ${data.time || ""}<br><br>
+    ${data.text || ""}
+  `;
 });
 
-// HISTORIQUE
+// HISTORIQUE RAPPORTS
 listen("system/reports_history", data => {
   const list = document.getElementById("reportsHistory");
   list.innerHTML = "";
   if (!data) return;
   Object.values(data).forEach(r => {
-    list.innerHTML += `<div class="card">${r.day} — ${r.summary}</div>`;
+    list.innerHTML += `
+      <div class="card">
+        <strong>${r.day || ""}</strong><br>
+        ${r.summary || ""}
+      </div>`;
   });
 });
 
-// AGENTS
+// RÉSULTATS AGENTS
 listen("nexus/agents", data => {
   const list = document.getElementById("agentsResults");
   list.innerHTML = "";
   if (!data) return;
   Object.values(data).forEach(a => {
-    list.innerHTML += `<div class="card"><strong>${a.agent}</strong><br>${a.result}</div>`;
+    list.innerHTML += `
+      <div class="card">
+        <strong>${a.agent || "Agent"}</strong><br>
+        ${a.result || ""}
+      </div>`;
   });
 });
 
-// CHAT
+// CHAT COMPLET (flux /chat)
 listen("chat", data => {
+  if (!chatWindow) return;
   chatWindow.innerHTML = "";
   if (!data) return;
+
   Object.values(data)
-    .sort((a, b) => a.timestamp - b.timestamp)
-    .forEach(m => appendChat(m.from === "mobile" ? "Monsieur" : "O.M.A.R", m.text, m.from === "mobile"));
+    .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+    .forEach(m => {
+      const isUser = m.from === "mobile" || m.from === "user";
+      const author = isUser ? "Monsieur" : "O.M.A.R";
+      appendChat(author, m.text || "", isUser);
+    });
 });
