@@ -7,10 +7,10 @@
   <!-- Optimisation mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-  <!-- PWA -->
+  <!-- PWA manifest (icônes, nom, thème, etc.) -->
   <link rel="manifest" href="manifest.json">
 
-  <!-- Style -->
+  <!-- Style principal -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -20,6 +20,7 @@
     <!-- HEADER -->
     <header class="app-header">
       <div class="title-block">
+        <!-- Tu peux remplacer le logo texte par une petite version de ton icône si tu veux -->
         <span class="logo">🔱</span>
         <div>
           <h1>O.M.A.R</h1>
@@ -38,7 +39,7 @@
       <button class="tab-button" data-tab="chat">Parler à O.M.A.R</button>
     </nav>
 
-    <!-- CONTENU -->
+    <!-- CONTENU PRINCIPAL -->
     <main class="tab-content">
 
       <!-- ALERTES -->
@@ -49,7 +50,7 @@
         </div>
       </section>
 
-      <!-- WATCHLIST -->
+      <!-- WATCHLIST / ACTIFS -->
       <section id="tab-watchlist" class="tab-panel">
         <h2>Actifs à surveiller</h2>
         <div id="watchlistSummary" class="summary-bar">
@@ -104,7 +105,7 @@
     </main>
   </div>
 
-  <!-- APP JS -->
+  <!-- Application HUD (Firebase + logique UI) -->
   <script type="module" src="app.js"></script>
 
   <!-- Service Worker (PWA) -->
