@@ -7,7 +7,11 @@
   <!-- Optimisation mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-  <!-- PWA manifest (icônes, nom, thème, etc.) -->
+  <!-- Icône O.M.A.R -->
+  <link rel="icon" type="image/jpeg" href="omar-logo-512.jpeg">
+  <link rel="apple-touch-icon" href="omar-logo-512.jpeg">
+
+  <!-- PWA manifest -->
   <link rel="manifest" href="manifest.json">
 
   <!-- Style principal -->
@@ -20,7 +24,7 @@
     <!-- HEADER -->
     <header class="app-header">
       <div class="title-block">
-        <span class="logo">🔱</span>
+        <img src="omar-logo-512.jpeg" alt="O.M.A.R" style="height:32px; border-radius:6px;" />
         <div>
           <h1>O.M.A.R</h1>
           <p>HUD Mobile — OMAR-SYSTEM</p>
@@ -81,38 +85,4 @@
 
       <!-- CHAT -->
       <section id="tab-chat" class="tab-panel">
-        <h2>Parler à O.M.A.R</h2>
-
-        <div id="chatWindow" class="chat-window">
-          <div class="chat-message system">
-            <strong>O.M.A.R</strong><br>
-            Monsieur, je suis à votre disposition. Vous pouvez m’écrire ci‑dessous.
-          </div>
-        </div>
-
-        <form id="chatForm" class="chat-input-bar">
-          <input
-            type="text"
-            id="chatInput"
-            placeholder="Parlez à O.M.A.R…"
-            autocomplete="off"
-          />
-          <button type="submit">Envoyer</button>
-        </form>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- Application HUD (Firebase + logique UI) -->
-  <script type="module" src="app.js"></script>
-
-  <!-- Service Worker (PWA) -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js");
-    }
-  </script>
-
-</body>
-</html>
+        <h2>Par
