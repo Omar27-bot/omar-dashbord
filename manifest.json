@@ -1,21 +1,27 @@
 {
-  "name": "OMAR — HUD Zenith Mobile",
+  "name": "O.M.A.R — HUD Zenith Mobile",
   "short_name": "OMAR Zenith",
+  "description": "Interface mobile institutionnelle du système O.M.A.R Zenith.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#d4af37",
-  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "omar-logo-512.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "omar-logo-512.jpeg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "purpose": "maskable"
     }
   ]
+}
+
 }
