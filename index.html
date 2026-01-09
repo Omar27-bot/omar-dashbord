@@ -2,105 +2,125 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>O.M.A.R — HUD Mobile</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-
-  <!-- Icône O.M.A.R -->
-  <link rel="icon" type="image/jpeg" href="/omar-dashbord/omar-logo-512.jpeg">
-  <link rel="apple-touch-icon" href="/omar-dashbord/omar-logo-512.jpeg">
-
-  <!-- PWA manifest -->
-  <link rel="manifest" href="/omar-dashbord/manifest.json">
-
-  <!-- Style principal -->
-  <link rel="stylesheet" href="/omar-dashbord/style.css" />
+  <title>OMAR — HUD Zenith Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <div id="app">
-
-    <header class="app-header">
-      <div class="title-block">
-        <img src="/omar-dashbord/omar-logo-512.jpeg" alt="O.M.A.R" style="height:32px; border-radius:6px;" />
-        <div>
-          <h1>O.M.A.R</h1>
-          <p>HUD Mobile — OMAR-SYSTEM</p>
-        </div>
+  <header class="app-header">
+    <div class="title-block">
+      <div>
+        <h1>O.M.A.R — ZENITH</h1>
+        <p>HUD Mobile institutionnel</p>
       </div>
-      <div class="status-pill" id="connectionStatus">Connexion…</div>
-    </header>
+    </div>
+    <div class="status-pill" id="hud-status">
+      EN SYNCHRO…
+    </div>
+  </header>
 
-    <nav class="tabs">
-      <button class="tab-button active" data-tab="alerts">Alertes</button>
-      <button class="tab-button" data-tab="watchlist">Actifs</button>
-      <button class="tab-button" data-tab="reports">Rapports</button>
-      <button class="tab-button" data-tab="agents">Agents</button>
-      <button class="tab-button" data-tab="chat">Parler à O.M.A.R</button>
-    </nav>
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="dashboard">Tableau de bord</button>
+    <button class="tab-button" data-tab="portfolio">Portefeuille</button>
+    <button class="tab-button" data-tab="alerts">Alertes agents</button>
+    <button class="tab-button" data-tab="council">Conseil</button>
+    <button class="tab-button" data-tab="world">Carte monde</button>
+    <button class="tab-button" data-tab="chat">Chat OMAR</button>
+  </nav>
 
-    <main class="tab-content">
-
-      <section id="tab-alerts" class="tab-panel active">
-        <h2>Alertes critiques & importantes</h2>
-        <div id="alertsList" class="card-list">
-          <p class="placeholder">Chargement des alertes…</p>
+  <main>
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab-panel active">
+      <div class="card-list">
+        <div class="card">
+          <h2>Valeur totale</h2>
+          <p id="dashboard-total" class="big-number">--,-- CAD</p>
+          <p id="dashboard-change" class="muted">Variation : --%</p>
         </div>
-      </section>
-
-      <section id="tab-watchlist" class="tab-panel">
-        <h2>Actifs à surveiller</h2>
-        <div class="summary-bar">
-          Valeur totale du portefeuille : <span id="portfolioValue">—</span>
-        </div>
-        <div id="watchlistList" class="card-list">
-          <p class="placeholder">Chargement des actifs…</p>
-        </div>
-      </section>
-
-      <section id="tab-reports" class="tab-panel">
-        <h2>Rapport de la journée</h2>
-        <article id="dailyReport" class="report-card">
-          <p class="placeholder">En attente du rapport journalier…</p>
-        </article>
-
-        <h3>Historique des rapports</h3>
-        <div id="reportsHistory" class="card-list"></div>
-      </section>
-
-      <section id="tab-agents" class="tab-panel">
-        <h2>Résultats des agents</h2>
-        <div id="agentsResults" class="card-list">
-          <p class="placeholder">En attente des rapports des agents…</p>
-        </div>
-      </section>
-
-      <section id="tab-chat" class="tab-panel">
-        <h2>Parler à O.M.A.R</h2>
-
-        <div id="chatWindow" class="chat-window">
-          <div class="chat-message system">
-            <strong>O.M.A.R</strong><br>
-            Monsieur, je suis à votre disposition. Vous pouvez m’écrire ci‑dessous.
+        <div class="card">
+          <h3>Dernière alerte agent</h3>
+          <div id="dashboard-last-alert" class="placeholder">
+            Aucune alerte récente.
           </div>
         </div>
+        <div class="card">
+          <h3>Carte du monde (résumé)</h3>
+          <div id="dashboard-world" class="placeholder">
+            En attente des données mondiales…
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <form id="chatForm" class="chat-input-bar">
-          <input type="text" id="chatInput" placeholder="Parlez à O.M.A.R…" autocomplete="off" />
-          <button type="submit">Envoyer</button>
-        </form>
-      </section>
+    <!-- PORTEFEUILLE -->
+    <section id="tab-portfolio" class="tab-panel">
+      <div class="card-list" id="portfolio-list">
+        <div class="placeholder">Chargement du portefeuille…</div>
+      </div>
+    </section>
 
-    </main>
-  </div>
+    <!-- ALERTES AGENTS -->
+    <section id="tab-alerts" class="tab-panel">
+      <div class="card-list" id="alerts-list">
+        <div class="placeholder">Aucune alerte pour l’instant.</div>
+      </div>
+    </section>
 
-  <script type="module" src="/omar-dashbord/app.js"></script>
+    <!-- CONSEIL SOUVERAIN -->
+    <section id="tab-council" class="tab-panel">
+      <div class="card">
+        <h2>Verdict du Conseil</h2>
+        <pre id="council-view" class="council-text">En attente du verdict…</pre>
+        <button id="btn-refresh-council" class="primary-btn">
+          🔄 Actualiser le verdict
+        </button>
+      </div>
+    </section>
 
+    <!-- CARTE DU MONDE -->
+    <section id="tab-world" class="tab-panel">
+      <div class="card-list" id="world-list">
+        <div class="card">
+          <h3>Amériques</h3>
+          <p id="world-americas" class="muted">--%</p>
+        </div>
+        <div class="card">
+          <h3>Europe</h3>
+          <p id="world-europe" class="muted">--%</p>
+        </div>
+        <div class="card">
+          <h3>Asie</h3>
+          <p id="world-asia" class="muted">--%</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAT OMAR -->
+    <section id="tab-chat" class="tab-panel">
+      <div class="chat-window" id="chat-window">
+        <div class="chat-message system">
+          Bonjour Monsieur. Je suis O.M.A.R, HUD Mobile connecté à Zenith.
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <input
+          id="chat-input"
+          type="text"
+          placeholder="Parler à O.M.A.R…"
+        />
+        <button id="chat-send">Envoyer</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/omar-dashbord/service-worker.js");
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js");
+      });
     }
   </script>
-
 </body>
 </html>
