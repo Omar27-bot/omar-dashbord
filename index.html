@@ -2,10 +2,13 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>OMAR — HUD Zenith Mobile</title>
+  <title>O.M.A.R — HUD Zenith Mobile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
+
+  <meta name="theme-color" content="#050507" />
 </head>
 <body>
   <header class="app-header">
@@ -23,9 +26,8 @@
   <nav class="tabs">
     <button class="tab-button active" data-tab="dashboard">Tableau de bord</button>
     <button class="tab-button" data-tab="portfolio">Portefeuille</button>
-    <button class="tab-button" data-tab="alerts">Alertes agents</button>
-    <button class="tab-button" data-tab="council">Conseil</button>
-    <button class="tab-button" data-tab="world">Carte monde</button>
+    <button class="tab-button" data-tab="alerts">Alertes</button>
+    <button class="tab-button" data-tab="world">Monde</button>
     <button class="tab-button" data-tab="chat">Chat OMAR</button>
   </nav>
 
@@ -38,12 +40,19 @@
           <p id="dashboard-total" class="big-number">--,-- CAD</p>
           <p id="dashboard-change" class="muted">Variation : --%</p>
         </div>
+
         <div class="card">
-          <h3>Dernière alerte agent</h3>
+          <h3>État des flux</h3>
+          <p id="dashboard-flux" class="muted">En attente des métriques…</p>
+        </div>
+
+        <div class="card">
+          <h3>Dernière alerte</h3>
           <div id="dashboard-last-alert" class="placeholder">
             Aucune alerte récente.
           </div>
         </div>
+
         <div class="card">
           <h3>Carte du monde (résumé)</h3>
           <div id="dashboard-world" class="placeholder">
@@ -55,31 +64,30 @@
 
     <!-- PORTEFEUILLE -->
     <section id="tab-portfolio" class="tab-panel">
+      <div class="section-header">
+        <h2>Portefeuille</h2>
+        <span id="portfolio-last-update" class="muted small">Dernière mise à jour : --:--</span>
+      </div>
       <div class="card-list" id="portfolio-list">
         <div class="placeholder">Chargement du portefeuille…</div>
       </div>
     </section>
 
-    <!-- ALERTES AGENTS -->
+    <!-- ALERTES -->
     <section id="tab-alerts" class="tab-panel">
+      <div class="section-header">
+        <h2>Alertes agents & système</h2>
+      </div>
       <div class="card-list" id="alerts-list">
         <div class="placeholder">Aucune alerte pour l’instant.</div>
       </div>
     </section>
 
-    <!-- CONSEIL SOUVERAIN -->
-    <section id="tab-council" class="tab-panel">
-      <div class="card">
-        <h2>Verdict du Conseil</h2>
-        <pre id="council-view" class="council-text">En attente du verdict…</pre>
-        <button id="btn-refresh-council" class="primary-btn">
-          🔄 Actualiser le verdict
-        </button>
-      </div>
-    </section>
-
-    <!-- CARTE DU MONDE -->
+    <!-- MONDE -->
     <section id="tab-world" class="tab-panel">
+      <div class="section-header">
+        <h2>Carte du monde</h2>
+      </div>
       <div class="card-list" id="world-list">
         <div class="card">
           <h3>Amériques</h3>
@@ -98,9 +106,12 @@
 
     <!-- CHAT OMAR -->
     <section id="tab-chat" class="tab-panel">
+      <div class="section-header">
+        <h2>Chat O.M.A.R</h2>
+      </div>
       <div class="chat-window" id="chat-window">
         <div class="chat-message system">
-          Bonjour Monsieur. Je suis O.M.A.R, HUD Mobile connecté à Zenith.
+          Monsieur, je suis O.M.A.R, HUD Mobile connecté à Zenith.
         </div>
       </div>
       <div class="chat-input-bar">
@@ -114,7 +125,7 @@
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
