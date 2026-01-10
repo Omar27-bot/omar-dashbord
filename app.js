@@ -233,10 +233,12 @@ if (db) {
   });
 
   chatSend.addEventListener("click", () => {
-    const txt = chatInput.value.trim();
-    if (!txt) return;
-    chatInput.value = "";
+    const txt = chatInput.value;
+    
+    // 🔱 Protocole CRYSTAL : Bloque l'envoi si le champ est vide ou composé d'espaces
+    if (!txt.trim()) return;
 
+    chatInput.value = "";
     appendChatMessage(txt, "user");
 
     push(ref(db, "/status/chat/inbox"), {
