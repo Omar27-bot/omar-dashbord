@@ -3,7 +3,7 @@
 // Logique institutionnelle (lecteur Firebase)
 // ---------------------------------------------------------
 
-// 1. Navigation par onglets
+// Navigation par onglets
 const tabButtons = document.querySelectorAll(".tab-button");
 const tabPanels = document.querySelectorAll(".tab-panel");
 
@@ -18,11 +18,37 @@ tabButtons.forEach((btn) => {
   });
 });
 
+// Éléments DOM clé
+const hudStatusEl = document.getElementById("hud-status");
+const dashboardTotal = document.getElementById("dashboard-total");
+const dashboardChange = document.getElementById("dashboard-change");
+const dashboardFlux = document.getElementById("dashboard-flux");
+const dashboardLastAlert = document.getElementById("dashboard-last-alert");
+const dashboardWorld = document.getElementById("dashboard-world");
+
+const portfolioList = document.getElementById("portfolio-list");
+const portfolioLastUpdate = document.getElementById("portfolio-last-update");
+
+const alertsList = document.getElementById("alerts-list");
+
+const worldAmericas = document.getElementById("world-americas");
+const worldEurope = document.getElementById("world-europe");
+const worldAsia = document.getElementById("world-asia");
+
+const chatWindow = document.getElementById("chat-window");
+const chatInput = document.getElementById("chat-input");
+const chatSend = document.getElementById("chat-send");
+
 // ---------------------------------------------------------
-// 2. Firebase (VERSION MODULAIRE V9)
+// Firebase V9 (CDN)
 // ---------------------------------------------------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push,
+} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCc7P7swrV4oXeOxMhFRZScIGmFB-gfkvg",
@@ -32,107 +58,26 @@ const firebaseConfig = {
   storageBucket: "omar-system.firebasestorage.app",
   messagingSenderId: "571385162146",
   appId: "1:571385162146:web:6763c7f74f02fc0f2ceafb",
-  measurementId: "G-8KMSZ5DVSS"
+  measurementId: "G-8KMSZ5DVSS",
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+let db;
 
-// ---------------------------------------------------------
-// 2.1 Portefeuille
-// ---------------------------------------------------------
-const portfolioList = document.getElementById("portfolio-list");
-const dashboardTotal = document.getElementById("dashboard-total");
-
-onValue(ref(db, "/status/portfolio"), (snap) => {
-  const data = snap.val();
-  if (!data || !data.assets) {
-    portfolioList.innerHTML = '<div class="placeholder">Aucun portefeuille disponible.</div>';
-    dashboardTotal.textContent = "--,-- CAD";
-    return;
-  }
-
-  const assets = data.assets;
-  let html = "";
-  let total = data.total_value || 0;
-
-  Object.keys(assets).forEach((sym) => {
-    const a = assets[sym];
-    html += `
-      <div class="card">
-        <h3>${sym}</h3>
-        <p class="muted">Quantité : ${a.qty}</p>
-        <p class="muted">Prix : ${a.price} CAD</p>
-        <p class="big-number">${a.value} CAD</p>
-      </div>
-    `;
-  });
-
-  portfolioList.innerHTML = html;
-  dashboardTotal.textContent = `${total} CAD`;
-});
-
-// ---------------------------------------------------------
-// 2.2 Alertes agents
-// ---------------------------------------------------------
-const alertsList = document.getElementById("alerts-list");
-const dashboardLastAlert = document.getElementById("dashboard-last-alert");
-
-onValue(ref(db, "/status/alerts"), (snap) => {
-  const data = snap.val();
-  if (!data) {
-    alertsList.innerHTML = '<div class="placeholder">Aucune alerte pour l’instant.</div>';
-    dashboardLastAlert.textContent = "Aucune alerte récente.";
-    return;
-  }
-
-  const alerts = Object.values(data).sort(
-    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-  );
-
-  let html = "";
-  alerts.forEach((al) => {
-    const sev = (al.severity || "info").toLowerCase();
-    const badgeClass =
-      sev === "critical" ? "badge-critical" :
-      sev === "warning" ? "badge-warning" :
-      "badge-info";
-
-    html += `
-      <div class="card">
-        <span class="badge ${badgeClass}">${sev.toUpperCase()}</span>
-        <h3>${al.title || "Alerte"}</h3>
-        <p class="muted">${al.agent || "Agent inconnu"} — ${al.timestamp || ""}</p>
-        <p>${al.message || ""}</p>
-      </div>
-    `;
-  });
-
-  alertsList.innerHTML = html;
-
-  const last = alerts[0];
-  dashboardLastAlert.innerHTML = `
-    <span class="badge ${badgeClassFromSeverity(last.severity)}">
-      ${(last.severity || "INFO").toUpperCase()}
-    </span>
-    <div>${last.title}</div>
-    <div class="muted">${last.agent} — ${last.timestamp}</div>
-  `;
-});
-
-function badgeClassFromSeverity(sev) {
-  const s = (sev || "info").toLowerCase();
-  if (s === "critical" || s === "danger" || s === "error") return "badge-critical";
-  if (s === "warning" || s === "alert") return "badge-warning";
-  return "badge-info";
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
+  if (hudStatusEl) hudStatusEl.textContent = "EN LIGNE";
+} catch (e) {
+  console.error("Firebase init error:", e);
+  if (hudStatusEl) hudStatusEl.textContent = "Firebase non chargé";
 }
 
 // ---------------------------------------------------------
-// 2.3 Chat OMAR
+// Helpers
 // ---------------------------------------------------------
-const chatWindow = document.getElementById("chat-window");
-const chatInput = document.getElementById("chat-input");
-const chatSend = document.getElementById("chat-send");
+function safe(val, def = "--") {
+  return val === undefined || val === null ? def : val;
+}
 
 function appendChatMessage(text, type) {
   const div = document.createElement("div");
@@ -142,28 +87,166 @@ function appendChatMessage(text, type) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-onValue(ref(db, "/status/chat/history"), (snap) => {
-  const data = snap.val();
-  if (!data) return;
+function badgeClassFromSeverity(sev) {
+  const s = (sev || "info").toLowerCase();
+  if (s === "critical" || s === "danger" || s === "error") return "badge-critical";
+  if (s === "warning" || s === "alert") return "badge-warning";
+  return "badge-info";
+}
 
-  chatWindow.innerHTML = "";
-  Object.values(data).forEach((msg) => {
-    appendChatMessage(msg.text, msg.sender === "user" ? "user" : "system");
+// ---------------------------------------------------------
+// 1. Portefeuille / Dashboard
+// ---------------------------------------------------------
+if (db) {
+  onValue(ref(db, "/status/portfolio"), (snap) => {
+    const data = snap.val();
+    if (!data || !data.assets) {
+      portfolioList.innerHTML =
+        '<div class="placeholder">Aucun portefeuille disponible.</div>';
+      dashboardTotal.textContent = "--,-- CAD";
+      dashboardChange.textContent = "Variation : --%";
+      if (portfolioLastUpdate) portfolioLastUpdate.textContent = "Dernière mise à jour : --:--";
+      return;
+    }
+
+    const assets = data.assets;
+    let html = "";
+    let total = data.total_value || 0;
+    const change = data.daily_change || 0;
+
+    Object.keys(assets).forEach((sym) => {
+      const a = assets[sym];
+      html += `
+        <div class="card">
+          <h3>${sym}</h3>
+          <p class="muted">Quantité : ${safe(a.qty, 0)}</p>
+          <p class="muted">Prix : ${safe(a.price, 0)} CAD</p>
+          <p class="big-number">${safe(a.value, 0)} CAD</p>
+        </div>
+      `;
+    });
+
+    portfolioList.innerHTML = html;
+    dashboardTotal.textContent = `${total} CAD`;
+    dashboardChange.textContent = `Variation : ${change} %`;
+    if (portfolioLastUpdate && data.last_update) {
+      portfolioLastUpdate.textContent = `Dernière mise à jour : ${data.last_update}`;
+    }
   });
-});
 
-chatSend.addEventListener("click", () => {
-  const txt = chatInput.value.trim();
-  if (!txt) return;
-  chatInput.value = "";
+  // -------------------------------------------------------
+  // 2. Alertes agents & système
+  // -------------------------------------------------------
+  onValue(ref(db, "/status/alerts"), (snap) => {
+    const data = snap.val();
+    if (!data) {
+      alertsList.innerHTML =
+        '<div class="placeholder">Aucune alerte pour l’instant.</div>';
+      dashboardLastAlert.textContent = "Aucune alerte récente.";
+      return;
+    }
 
-  push(ref(db, "/status/chat/inbox"), {
-    text: txt,
-    sender: "user",
-    timestamp: new Date().toISOString()
+    const alerts = Object.values(data).sort(
+      (a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0)
+    );
+
+    let html = "";
+    alerts.forEach((al) => {
+      const sev = (al.severity || "info").toLowerCase();
+      const badgeClass = badgeClassFromSeverity(sev);
+      html += `
+        <div class="card">
+          <span class="badge ${badgeClass}">${sev.toUpperCase()}</span>
+          <h3>${safe(al.title, "Alerte")}</h3>
+          <p class="muted">${safe(al.agent, "Agent inconnu")} — ${safe(al.timestamp, "")}</p>
+          <p>${safe(al.message, "")}</p>
+        </div>
+      `;
+    });
+
+    alertsList.innerHTML = html;
+
+    const last = alerts[0];
+    const lastBadgeClass = badgeClassFromSeverity(last.severity);
+    dashboardLastAlert.innerHTML = `
+      <span class="badge ${lastBadgeClass}">
+        ${(last.severity || "INFO").toUpperCase()}
+      </span>
+      <div>${safe(last.title, "Alerte")}</div>
+      <div class="muted">${safe(last.agent, "")} — ${safe(last.timestamp, "")}</div>
+    `;
   });
-});
 
-chatInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") chatSend.click();
-});
+  // -------------------------------------------------------
+  // 3. WorldMap / Marchés Globaux
+  // -------------------------------------------------------
+  onValue(ref(db, "/status/worldmap"), (snap) => {
+    const data = snap.val();
+    if (!data || !data.regions) {
+      worldAmericas.textContent = "--%";
+      worldEurope.textContent = "--%";
+      worldAsia.textContent = "--%";
+      dashboardWorld.textContent = "Aucune donnée mondiale.";
+      return;
+    }
+
+    const regions = data.regions;
+    const [row1] = regions;
+
+    worldAmericas.textContent = `${row1[0].toFixed(2)}%`;
+    worldEurope.textContent = `${row1[1].toFixed(2)}%`;
+    worldAsia.textContent = `${row1[2].toFixed(2)}%`;
+
+    dashboardWorld.textContent = `Amériques: ${row1[0].toFixed(
+      2
+    )}% | Europe: ${row1[1].toFixed(2)}% | Asie: ${row1[2].toFixed(2)}%`;
+  });
+
+  // -------------------------------------------------------
+  // 4. Statut HUD / Flux
+  // -------------------------------------------------------
+  onValue(ref(db, "/status/system"), (snap) => {
+    const data = snap.val();
+    if (!data) {
+      if (hudStatusEl) hudStatusEl.textContent = "OFFLINE";
+      dashboardFlux.textContent = "Flux indisponibles.";
+      return;
+    }
+    if (hudStatusEl) hudStatusEl.textContent = data.message || "EN LIGNE";
+    dashboardFlux.textContent = data.flux_status || "Flux : OK";
+  });
+
+  // -------------------------------------------------------
+  // 5. Chat OMAR (lecture + envoi)
+  // -------------------------------------------------------
+  onValue(ref(db, "/status/chat/history"), (snap) => {
+    const data = snap.val();
+    if (!data) return;
+    chatWindow.innerHTML = "";
+    Object.values(data).forEach((msg) => {
+      const type =
+        msg.sender === "user"
+          ? "user"
+          : "assistant";
+      appendChatMessage(msg.text || "", type);
+    });
+  });
+
+  chatSend.addEventListener("click", () => {
+    const txt = chatInput.value.trim();
+    if (!txt) return;
+    chatInput.value = "";
+
+    appendChatMessage(txt, "user");
+
+    push(ref(db, "/status/chat/inbox"), {
+      text: txt,
+      sender: "user",
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") chatSend.click();
+  });
+}
