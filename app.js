@@ -1,3 +1,32 @@
+// Import Firebase (version Web ES Modules)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+// Configuration Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCc7P7swrV4oXeOxMhFRZScIGmFB-gfkvg",
+  authDomain: "omar-system.firebaseapp.com",
+  databaseURL: "https://omar-system-default-rtdb.firebaseio.com",
+  projectId: "omar-system",
+  storageBucket: "omar-system.firebasestorage.app",
+  messagingSenderId: "571385162146",
+  appId: "1:571385162146:web:6763c7f74f02fc0f2ceafb",
+  measurementId: "G-8KMSZ5DVSS"
+};
+
+// Initialisation Firebase
+const app = initializeApp(firebaseConfig);
+
+// Analytics (uniquement si HTTPS + navigateur compatible)
+let analytics = null;
+try {
+  analytics = getAnalytics(app);
+} catch (e) {
+  console.warn("Analytics non disponible dans cet environnement.");
+}
+
+export { app, analytics };
+
 // Données OMAR — pourraient être alimentées par WebSocket / API / Webhook plus tard
 const state = {
     profile: "DAY",
