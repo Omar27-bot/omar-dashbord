@@ -1,15 +1,25 @@
 {
   "name": "O.M.A.R — HUD Zenith Mobile",
   "short_name": "OMAR HUD",
-  "start_url": "index.html",
+  "description": "Cockpit institutionnel mobile — CRYSTAL CORE, supervision, alertes, portefeuille, intelligence OMAR.",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#050507",
   "theme_color": "#050507",
   "icons": [
     {
       "src": "omar-logo-512.jpeg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "omar-logo-512.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
     }
   ]
 }
