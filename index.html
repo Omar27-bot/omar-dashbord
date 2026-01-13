@@ -1,153 +1,93 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>O.M.A.R — HUD Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="omar-logo-512.jpeg" type="image/jpeg" />
-  <meta name="theme-color" content="#050507" />
+    <meta charset="UTF-8">
+    <title>OMAR HUD Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="omar-logo-512.jpeg">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Splash Screen ZENITH -->
-  <div id="splash-screen" class="splash-screen">
-    <div class="splash-logo">
-      <img src="omar-logo-512.jpeg" alt="O.M.A.R logo" />
+    <div id="app">
+        <header class="omar-header">
+            <img src="omar-logo-512.jpeg" alt="OMAR Logo" class="omar-logo">
+            <div class="omar-title-block">
+                <h1 class="omar-title">OMAR HUD</h1>
+                <p class="omar-subtitle">ZENITH — Mobile Vision</p>
+            </div>
+        </header>
+
+        <main class="omar-main">
+            <section class="omar-card" id="omar-card">
+                <div class="omar-card-header">
+                    <span class="omar-badge" id="omar-decision-badge">NEUTRAL</span>
+                    <span class="omar-tag" id="omar-profile-tag">PROFILE: DAY</span>
+                </div>
+
+                <div class="omar-index-block">
+                    <span class="omar-index-label">OMAR INDEX</span>
+                    <span class="omar-index-value" id="omar-index">50</span>
+                </div>
+
+                <div class="omar-grid">
+                    <div class="omar-grid-item">
+                        <span class="omar-grid-label">Régime</span>
+                        <span class="omar-grid-value" id="omar-regime">NEUTRAL</span>
+                    </div>
+                    <div class="omar-grid-item">
+                        <span class="omar-grid-label">Stress</span>
+                        <span class="omar-grid-value" id="omar-stress">1.2 %</span>
+                    </div>
+                    <div class="omar-grid-item">
+                        <span class="omar-grid-label">Stress Level</span>
+                        <span class="omar-grid-value" id="omar-stress-level">MEDIUM</span>
+                    </div>
+                    <div class="omar-grid-item">
+                        <span class="omar-grid-label">Risk Level</span>
+                        <span class="omar-grid-value" id="omar-risk-level">MODERATE</span>
+                    </div>
+                </div>
+
+                <div class="omar-footer-row">
+                    <span class="omar-status-dot" id="omar-status-dot"></span>
+                    <span class="omar-status-text" id="omar-status-text">
+                        En attente de données…
+                    </span>
+                </div>
+
+                <div class="omar-footer-meta">
+                    <span id="omar-last-update">Dernière mise à jour : —</span>
+                </div>
+            </section>
+
+            <!-- Bloc de test local (peut être retiré en prod) -->
+            <section class="omar-test-panel">
+                <h2>Mode Démo</h2>
+                <p>Simule des scénarios OMAR pour tester le HUD mobile.</p>
+                <div class="omar-buttons-row">
+                    <button class="omar-btn risk-on" data-scenario="RISK_ON">RISK_ON</button>
+                    <button class="omar-btn hedge" data-scenario="HEDGE">HEDGE</button>
+                    <button class="omar-btn risk-off" data-scenario="RISK_OFF">RISK_OFF</button>
+                    <button class="omar-btn crisis" data-scenario="CRISIS">CRISIS</button>
+                </div>
+            </section>
+        </main>
     </div>
-    <div class="splash-text">O.M.A.R — CRYSTAL CORE</div>
-    <div class="splash-subtext">Initialisation du HUD institutionnel...</div>
-    <div class="splash-bar">
-      <div class="splash-bar-fill"></div>
-    </div>
-  </div>
 
-  <header class="app-header">
-    <div class="title-block">
-      <h1>O.M.A.R — CRYSTAL CORE</h1>
-      <p>HUD institutionnel mobile</p>
-    </div>
-    <div id="hud-status" class="status-pill">Chargement...</div>
-  </header>
+    <!-- App logic -->
+    <script src="app.js"></script>
 
-  <nav class="tabs">
-    <button class="tab-button active" data-tab="dashboard">Dashboard</button>
-    <button class="tab-button" data-tab="portfolio">Portefeuille</button>
-    <button class="tab-button" data-tab="alerts">Alertes</button>
-    <button class="tab-button" data-tab="institutional">Institutionnel</button>
-    <button class="tab-button" data-tab="chat">O.M.A.R</button>
-  </nav>
-
-  <main>
-    <!-- DASHBOARD -->
-    <section id="tab-dashboard" class="tab-panel active">
-      <div class="section-header">
-        <h2>Vue globale</h2>
-      </div>
-      <div class="card-list">
-        <div class="card">
-          <h3>Valeur totale</h3>
-          <p id="dashboard-total" class="big-number">--,-- CAD</p>
-          <p id="dashboard-change" class="muted">Variation : --%</p>
-        </div>
-        <div class="card">
-          <h3>Dernière alerte</h3>
-          <div id="dashboard-last-alert" class="muted">Chargement...</div>
-        </div>
-        <div class="card">
-          <h3>Marchés globaux</h3>
-          <p id="dashboard-world" class="muted">Chargement...</p>
-        </div>
-        <div class="card">
-          <h3>Flux système</h3>
-          <p id="dashboard-flux" class="muted">Chargement...</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- PORTEFEUILLE -->
-    <section id="tab-portfolio" class="tab-panel">
-      <div class="section-header">
-        <h2>Portefeuille</h2>
-        <span id="portfolio-last-update" class="small muted">Dernière mise à jour : --:--</span>
-      </div>
-      <div id="portfolio-list" class="card-list">
-        <div class="placeholder">Chargement du portefeuille...</div>
-      </div>
-    </section>
-
-    <!-- ALERTES -->
-    <section id="tab-alerts" class="tab-panel">
-      <div class="section-header">
-        <h2>Alertes actives</h2>
-      </div>
-      <div id="alerts-list" class="card-list">
-        <div class="placeholder">Chargement des alertes...</div>
-      </div>
-    </section>
-
-    <!-- INSTITUTIONNEL -->
-    <section id="tab-institutional" class="tab-panel">
-      <div class="section-header">
-        <h2>Vue institutionnelle</h2>
-      </div>
-      <div class="card-list">
-        <div class="card">
-          <h3>Macro</h3>
-          <p id="inst-macro-regime" class="muted">Régime : --</p>
-          <p id="inst-macro-stress" class="muted">Stress : --</p>
-          <p id="inst-macro-systemic" class="muted">Risque systémique : --</p>
-        </div>
-        <div class="card">
-          <h3>Risque institutionnel</h3>
-          <p id="inst-risk-level" class="muted">Niveau : --</p>
-          <p id="inst-risk-trend" class="muted">Trend : --</p>
-        </div>
-        <div class="card">
-          <h3>Décision stratégique</h3>
-          <p id="inst-strategy-decision" class="muted">Décision : --</p>
-          <p id="inst-strategy-severity" class="muted">Sévérité : --</p>
-        </div>
-        <div class="card">
-          <h3>Système</h3>
-          <p id="inst-system-stability" class="muted">Stabilité : --</p>
-          <p id="inst-system-last-major" class="muted">Dernier MAJOR : --</p>
-        </div>
-        <div class="card">
-          <h3>Scénarios</h3>
-          <div id="inst-scenarios-list" class="small muted">
-            Aucun scénario disponible.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CHAT O.M.A.R -->
-    <section id="tab-chat" class="tab-panel">
-      <div class="section-header">
-        <h2>O.M.A.R — Canal institutionnel</h2>
-      </div>
-      <div id="chat-window" class="chat-window">
-        <div class="chat-message system">
-          Canal institutionnel prêt. Parlez à O.M.A.R...
-        </div>
-      </div>
-      <div class="chat-input-bar">
-        <input id="chat-input" type="text" placeholder="Parler à O.M.A.R..." />
-        <button id="voice-button" title="Dictée vocale">🎤</button>
-        <button id="chat-send">Envoyer</button>
-      </div>
-      <p id="voice-status" class="small muted"></p>
-    </section>
-  </main>
-
-  <script type="module" src="app.js"></script>
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("Service Worker OMAR actif"))
-        .catch(err => console.error("SW error:", err));
-    }
-  </script>
+    <!-- Service Worker -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service_worker.js");
+        }
+    </script>
 </body>
 </html>
