@@ -3,7 +3,7 @@
 // Logique institutionnelle (lecteur Firebase)
 // ---------------------------------------------------------
 
-// Navigation par onglets
+// 🔱 Navigation par onglets
 const tabButtons = document.querySelectorAll(".tab-button");
 const tabPanels = document.querySelectorAll(".tab-panel");
 
@@ -12,13 +12,12 @@ tabButtons.forEach((btn) => {
     const target = btn.dataset.tab;
     tabButtons.forEach((b) => b.classList.remove("active"));
     tabPanels.forEach((p) => p.classList.remove("active"));
-
     btn.classList.add("active");
     document.getElementById(`tab-${target}`).classList.add("active");
   });
 });
 
-// Éléments DOM clé
+// 🔱 Éléments DOM institutionnels
 const hudStatusEl = document.getElementById("hud-status");
 const dashboardTotal = document.getElementById("dashboard-total");
 const dashboardChange = document.getElementById("dashboard-change");
@@ -31,17 +30,22 @@ const portfolioLastUpdate = document.getElementById("portfolio-last-update");
 
 const alertsList = document.getElementById("alerts-list");
 
-const worldAmericas = document.getElementById("world-americas");
-const worldEurope = document.getElementById("world-europe");
-const worldAsia = document.getElementById("world-asia");
+const instMacroRegime = document.getElementById("inst-macro-regime");
+const instMacroStress = document.getElementById("inst-macro-stress");
+const instMacroSystemic = document.getElementById("inst-macro-systemic");
+const instRiskLevel = document.getElementById("inst-risk-level");
+const instRiskTrend = document.getElementById("inst-risk-trend");
+const instStratDecision = document.getElementById("inst-strategy-decision");
+const instStratSeverity = document.getElementById("inst-strategy-severity");
+const instSystemStability = document.getElementById("inst-system-stability");
+const instSystemLastMajor = document.getElementById("inst-system-last-major");
+const instScenariosList = document.getElementById("inst-scenarios-list");
 
 const chatWindow = document.getElementById("chat-window");
 const chatInput = document.getElementById("chat-input");
 const chatSend = document.getElementById("chat-send");
 
-// ---------------------------------------------------------
-// Firebase V9 (CDN)
-// ---------------------------------------------------------
+// 🔱 Firebase V9 (CDN)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import {
   getDatabase,
@@ -55,7 +59,7 @@ const firebaseConfig = {
   authDomain: "omar-system.firebaseapp.com",
   databaseURL: "https://omar-system-default-rtdb.firebaseio.com",
   projectId: "omar-system",
-  storageBucket: "omar-system.firebasestorage.app",
+  storageBucket: "omar-system.appspot.com",
   messagingSenderId: "571385162146",
   appId: "1:571385162146:web:6763c7f74f02fc0f2ceafb",
   measurementId: "G-8KMSZ5DVSS",
@@ -72,9 +76,7 @@ try {
   if (hudStatusEl) hudStatusEl.textContent = "Firebase non chargé";
 }
 
-// ---------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------
+// 🔱 Helpers
 function safe(val, def = "--") {
   return val === undefined || val === null ? def : val;
 }
@@ -94,15 +96,13 @@ function badgeClassFromSeverity(sev) {
   return "badge-info";
 }
 
-// ---------------------------------------------------------
-// 1. Portefeuille / Dashboard
-// ---------------------------------------------------------
+// 🔱 HUD institutionnel
 if (db) {
+  // 1. Portefeuille
   onValue(ref(db, "/status/portfolio"), (snap) => {
     const data = snap.val();
     if (!data || !data.assets) {
-      portfolioList.innerHTML =
-        '<div class="placeholder">Aucun portefeuille disponible.</div>';
+      portfolioList.innerHTML = '<div class="placeholder">Aucun portefeuille disponible.</div>';
       dashboardTotal.textContent = "--,-- CAD";
       dashboardChange.textContent = "Variation : --%";
       if (portfolioLastUpdate) portfolioLastUpdate.textContent = "Dernière mise à jour : --:--";
@@ -134,14 +134,11 @@ if (db) {
     }
   });
 
-  // -------------------------------------------------------
-  // 2. Alertes agents & système
-  // -------------------------------------------------------
+  // 2. Alertes
   onValue(ref(db, "/status/alerts"), (snap) => {
     const data = snap.val();
     if (!data) {
-      alertsList.innerHTML =
-        '<div class="placeholder">Aucune alerte pour l’instant.</div>';
+      alertsList.innerHTML = '<div class="placeholder">Aucune alerte pour l’instant.</div>';
       dashboardLastAlert.textContent = "Aucune alerte récente.";
       return;
     }
@@ -177,78 +174,34 @@ if (db) {
     `;
   });
 
-  // -------------------------------------------------------
-  // 3. WorldMap / Marchés Globaux
-  // -------------------------------------------------------
-  onValue(ref(db, "/status/worldmap"), (snap) => {
-    const data = snap.val();
-    if (!data || !data.regions) {
-      worldAmericas.textContent = "--%";
-      worldEurope.textContent = "--%";
-      worldAsia.textContent = "--%";
-      dashboardWorld.textContent = "Aucune donnée mondiale.";
-      return;
-    }
-
-    const regions = data.regions;
-    const [row1] = regions;
-
-    worldAmericas.textContent = `${row1[0].toFixed(2)}%`;
-    worldEurope.textContent = `${row1[1].toFixed(2)}%`;
-    worldAsia.textContent = `${row1[2].toFixed(2)}%`;
-
-    dashboardWorld.textContent = `Amériques: ${row1[0].toFixed(
-      2
-    )}% | Europe: ${row1[1].toFixed(2)}% | Asie: ${row1[2].toFixed(2)}%`;
-  });
-
-  // -------------------------------------------------------
-  // 4. Statut HUD / Flux
-  // -------------------------------------------------------
-  onValue(ref(db, "/status/system"), (snap) => {
-    const data = snap.val();
-    if (!data) {
-      if (hudStatusEl) hudStatusEl.textContent = "OFFLINE";
-      dashboardFlux.textContent = "Flux indisponibles.";
-      return;
-    }
-    if (hudStatusEl) hudStatusEl.textContent = data.message || "EN LIGNE";
-    dashboardFlux.textContent = data.flux_status || "Flux : OK";
-  });
-
-  // -------------------------------------------------------
-  // 5. Chat OMAR (lecture + envoi)
-  // -------------------------------------------------------
-  onValue(ref(db, "/status/chat/history"), (snap) => {
+  // 3. Institutionnel
+  onValue(ref(db, "/status/institutional_mobile"), (snap) => {
     const data = snap.val();
     if (!data) return;
-    chatWindow.innerHTML = "";
-    Object.values(data).forEach((msg) => {
-      const type =
-        msg.sender === "user"
-          ? "user"
-          : "assistant";
-      appendChatMessage(msg.text || "", type);
-    });
-  });
 
-  chatSend.addEventListener("click", () => {
-    const txt = chatInput.value;
-    
-    // 🔱 Protocole CRYSTAL : Bloque l'envoi si le champ est vide ou composé d'espaces
-    if (!txt.trim()) return;
+    const macro = data.macro || {};
+    const risk = data.risk || {};
+    const strategy = data.strategy || {};
+    const system = data.system || {};
+    const scenarios = data.scenarios || [];
 
-    chatInput.value = "";
-    appendChatMessage(txt, "user");
+    instMacroRegime.textContent = `Régime : ${safe(macro.regime)}`;
+    instMacroStress.textContent = `Stress : ${safe(macro.stress)}`;
+    instMacroSystemic.textContent = `Risque systémique : ${safe(macro.systemic_risk)}`;
 
-    push(ref(db, "/status/chat/inbox"), {
-      text: txt,
-      sender: "user",
-      timestamp: new Date().toISOString(),
-    });
-  });
+    instRiskLevel.textContent = `Niveau : ${safe(risk.level)}`;
+    instRiskTrend.textContent = `Trend : ${safe(risk.trend)}`;
 
-  chatInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") chatSend.click();
-  });
-}
+    instStratDecision.textContent = `Décision : ${safe(strategy.decision)}`;
+    instStratSeverity.textContent = `Sévérité : ${safe(strategy.severity)}`;
+
+    instSystemStability.textContent = `Stabilité : ${safe(system.stability)}`;
+    instSystemLastMajor.textContent = `Dernier MAJOR : ${safe(system.last_major)}`;
+
+    instScenariosList.innerHTML = scenarios.length
+      ? scenarios
+          .map(
+            (s) =>
+              `<div class="muted">[${safe(s.type)}] p=${safe(s.probability)}, sev=${safe(
+                s.severity
+              )} — ${safe(s.description)}</div>`
