@@ -1,3 +1,8 @@
+/* ---------------------------------------------------------
+   O.M.A.R — HUD Zenith Mobile
+   Style institutionnel premium
+--------------------------------------------------------- */
+
 *,
 *::before,
 *::after {
@@ -12,7 +17,9 @@ body {
   color: #f5f5f5;
 }
 
-/* Header */
+/* ---------------------------------------------------------
+   Header
+--------------------------------------------------------- */
 
 .app-header {
   display: flex;
@@ -45,7 +52,20 @@ body {
   color: #9ff5c7;
 }
 
-/* Tabs */
+/* Heartbeat animation for live status */
+@keyframes heartbeat {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.status-pill.live {
+  animation: heartbeat 1.8s infinite ease-in-out;
+}
+
+/* ---------------------------------------------------------
+   Tabs
+--------------------------------------------------------- */
 
 .tabs {
   display: flex;
@@ -72,13 +92,17 @@ body {
   background: linear-gradient(to top, #111116, transparent);
 }
 
-/* Main */
+/* ---------------------------------------------------------
+   Main
+--------------------------------------------------------- */
 
 main {
   padding: 12px;
 }
 
-/* Cards */
+/* ---------------------------------------------------------
+   Cards
+--------------------------------------------------------- */
 
 .card-list {
   display: flex;
@@ -87,11 +111,12 @@ main {
 }
 
 .card {
-  background: linear-gradient(135deg, #11111a, #07070c);
-  border-radius: 10px;
-  padding: 10px 12px;
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  background: rgba(17, 17, 26, 0.6);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
 }
 
 .card h2,
@@ -122,7 +147,9 @@ main {
   color: #77778a;
 }
 
-/* Section headers */
+/* ---------------------------------------------------------
+   Section headers
+--------------------------------------------------------- */
 
 .section-header {
   display: flex;
@@ -136,7 +163,9 @@ main {
   font-size: 0.95rem;
 }
 
-/* Badges */
+/* ---------------------------------------------------------
+   Badges
+--------------------------------------------------------- */
 
 .badge {
   display: inline-block;
@@ -164,7 +193,9 @@ main {
   border: 1px solid rgba(140, 180, 220, 0.7);
 }
 
-/* Tabs panel */
+/* ---------------------------------------------------------
+   Tabs panel
+--------------------------------------------------------- */
 
 .tab-panel {
   display: none;
@@ -174,7 +205,9 @@ main {
   display: block;
 }
 
-/* Chat */
+/* ---------------------------------------------------------
+   Chat
+--------------------------------------------------------- */
 
 .chat-window {
   height: 50vh;
@@ -231,7 +264,9 @@ main {
   cursor: pointer;
 }
 
-/* Buttons */
+/* ---------------------------------------------------------
+   Buttons
+--------------------------------------------------------- */
 
 .primary-btn {
   padding: 8px 12px;
@@ -243,7 +278,9 @@ main {
   cursor: pointer;
 }
 
-/* Scrollbar */
+/* ---------------------------------------------------------
+   Scrollbar
+--------------------------------------------------------- */
 
 .chat-window::-webkit-scrollbar {
   width: 6px;
@@ -252,4 +289,28 @@ main {
 .chat-window::-webkit-scrollbar-thumb {
   background: #303040;
   border-radius: 999px;
+}
+
+/* ---------------------------------------------------------
+   MODE CRISIS — Interface rouge institutionnelle
+--------------------------------------------------------- */
+
+.crisis-mode body {
+  background: radial-gradient(circle at top, #2a0000 0%, #150000 45%, #000000 100%);
+}
+
+.crisis-mode .app-header {
+  background: #2a0000;
+  border-bottom-color: #550000;
+}
+
+.crisis-mode .status-pill {
+  background: rgba(255, 0, 0, 0.15);
+  border-color: #ff4444;
+  color: #ffb3b3;
+}
+
+.crisis-mode .card {
+  border-color: rgba(255, 0, 0, 0.25);
+  box-shadow: 0 8px 18px rgba(255, 0, 0, 0.25);
 }
