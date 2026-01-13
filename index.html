@@ -2,135 +2,65 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>O.M.A.R — HUD Zenith Mobile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="manifest" href="manifest.json" />
+  <title>O.M.A.R — HUD Mobile</title>
   <link rel="stylesheet" href="style.css" />
-
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="omar-logo-512.jpeg" type="image/jpeg" />
   <meta name="theme-color" content="#050507" />
 </head>
 <body>
   <header class="app-header">
     <div class="title-block">
-      <div>
-        <h1>O.M.A.R — ZENITH</h1>
-        <p>HUD Mobile institutionnel</p>
-      </div>
+      <h1>O.M.A.R — CRYSTAL CORE</h1>
+      <p>HUD institutionnel mobile</p>
     </div>
-    <div class="status-pill" id="hud-status">
-      EN SYNCHRO…
-    </div>
+    <div id="hud-status" class="status-pill">Chargement...</div>
   </header>
 
   <nav class="tabs">
-    <button class="tab-button active" data-tab="dashboard">Tableau de bord</button>
+    <button class="tab-button active" data-tab="dashboard">Dashboard</button>
     <button class="tab-button" data-tab="portfolio">Portefeuille</button>
     <button class="tab-button" data-tab="alerts">Alertes</button>
-    <button class="tab-button" data-tab="world">Monde</button>
-    <button class="tab-button" data-tab="chat">Chat OMAR</button>
+    <button class="tab-button" data-tab="institutional">Institutionnel</button>
+    <button class="tab-button" data-tab="chat">O.M.A.R</button>
   </nav>
 
   <main>
-    <!-- DASHBOARD -->
     <section id="tab-dashboard" class="tab-panel active">
+      <div class="section-header">
+        <h2>Vue globale</h2>
+      </div>
       <div class="card-list">
         <div class="card">
-          <h2>Valeur totale</h2>
+          <h3>Valeur totale</h3>
           <p id="dashboard-total" class="big-number">--,-- CAD</p>
           <p id="dashboard-change" class="muted">Variation : --%</p>
         </div>
-
-        <div class="card">
-          <h3>État des flux</h3>
-          <p id="dashboard-flux" class="muted">En attente des métriques…</p>
-        </div>
-
         <div class="card">
           <h3>Dernière alerte</h3>
-          <div id="dashboard-last-alert" class="placeholder">
-            Aucune alerte récente.
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Carte du monde (résumé)</h3>
-          <div id="dashboard-world" class="placeholder">
-            En attente des données mondiales…
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PORTEFEUILLE -->
-    <section id="tab-portfolio" class="tab-panel">
-      <div class="section-header">
-        <h2>Portefeuille</h2>
-        <span id="portfolio-last-update" class="muted small">Dernière mise à jour : --:--</span>
-      </div>
-      <div class="card-list" id="portfolio-list">
-        <div class="placeholder">Chargement du portefeuille…</div>
-      </div>
-    </section>
-
-    <!-- ALERTES -->
-    <section id="tab-alerts" class="tab-panel">
-      <div class="section-header">
-        <h2>Alertes agents & système</h2>
-      </div>
-      <div class="card-list" id="alerts-list">
-        <div class="placeholder">Aucune alerte pour l’instant.</div>
-      </div>
-    </section>
-
-    <!-- MONDE -->
-    <section id="tab-world" class="tab-panel">
-      <div class="section-header">
-        <h2>Carte du monde</h2>
-      </div>
-      <div class="card-list" id="world-list">
-        <div class="card">
-          <h3>Amériques</h3>
-          <p id="world-americas" class="muted">--%</p>
+          <div id="dashboard-last-alert" class="muted">Chargement...</div>
         </div>
         <div class="card">
-          <h3>Europe</h3>
-          <p id="world-europe" class="muted">--%</p>
+          <h3>Marchés globaux</h3>
+          <p id="dashboard-world" class="muted">Chargement...</p>
         </div>
         <div class="card">
-          <h3>Asie</h3>
-          <p id="world-asia" class="muted">--%</p>
+          <h3>Flux système</h3>
+          <p id="dashboard-flux" class="muted">Chargement...</p>
         </div>
       </div>
     </section>
 
-    <!-- CHAT OMAR -->
-    <section id="tab-chat" class="tab-panel">
-      <div class="section-header">
-        <h2>Chat O.M.A.R</h2>
-      </div>
-      <div class="chat-window" id="chat-window">
-        <div class="chat-message system">
-          Monsieur, je suis O.M.A.R, HUD Mobile connecté à Zenith.
-        </div>
-      </div>
-      <div class="chat-input-bar">
-        <input
-          id="chat-input"
-          type="text"
-          placeholder="Parler à O.M.A.R…"
-        />
-        <button id="chat-send">Envoyer</button>
-      </div>
-    </section>
+    <!-- Les autres onglets seront ajoutés ensuite : Portefeuille, Alertes, Institutionnel, Chat -->
   </main>
 
   <script type="module" src="app.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js");
-      });
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker OMAR actif"))
+        .catch(err => console.error("SW error:", err));
     }
   </script>
 </body>
