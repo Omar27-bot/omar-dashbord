@@ -1,5 +1,5 @@
 /* ============================================================
-   O.M.A.R — ZENITH SOUVERAIN (STYLISME MOBILE)
+   O.M.A.R — ZENITH SOUVERAIN (STYLISME MOBILE V11)
    Ambiance : Glassmorphism, Institutionnel, Douillet
    ============================================================ */
 
@@ -16,13 +16,13 @@ body {
     background: radial-gradient(circle at top right, #0a0c10, #050608);
     color: #f5f5f5;
     min-height: 100vh;
-    line-height: 1.5;
+    overflow-x: hidden;
 }
 
 #app {
     max-width: 480px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px 20px 80px 20px; /* Espace pour la navigation basse */
 }
 
 /* Header Institutionnel */
@@ -44,95 +44,139 @@ body {
 }
 
 .omar-title {
-    font-size: 16px;
-    letter-spacing: 3px;
+    font-size: 14px;
+    letter-spacing: 2px;
     font-weight: 800;
-    color: #fff;
+    text-transform: uppercase;
 }
 
-/* Carte Miroir "Douillette" (Glassmorphism) */
+/* Gestion des Vues */
+.view {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.view.active {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Carte Miroir (Glassmorphism) */
 .omar-card {
-    background: rgba(18, 20, 25, 0.7);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 24px;
     padding: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Asset Monitor (CVS.NE Focus) */
+/* Asset Monitor (Vision Patrimoniale) */
 .omar-asset-monitor {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 14px;
     padding: 12px 16px;
     margin-bottom: 20px;
-    border-left: 3px solid #00ffff;
-}
-
-.asset-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-left: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .asset-symbol {
     font-weight: 700;
-    color: #00ffff;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Section Conseil (Chat) */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bot-msg, .user-msg {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 15px;
     font-size: 14px;
 }
 
-.asset-qty {
-    font-size: 11px;
-    opacity: 0.6;
+.bot-msg {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.07);
+    border-left: 3px solid #00ffff;
 }
 
-/* Index & Valeurs */
-.omar-index-value {
-    font-size: 48px;
-    font-weight: 800;
-    background: linear-gradient(to bottom, #fff, #888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -1px;
+.user-msg {
+    align-self: flex-end;
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Grille Institutionnelle */
-.omar-grid-item {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    padding: 12px;
-    border-radius: 16px;
+.chat-input-area {
+    display: flex;
+    padding: 15px;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.omar-grid-label {
-    font-size: 9px;
-    color: #888;
-    margin-bottom: 4px;
+#user-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    outline: none;
 }
 
-/* Animations de Statut */
-.omar-status-dot.pulse {
-    animation: pulse-animation 2s infinite;
+/* Navigation Basse */
+.omar-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    background: rgba(5, 6, 8, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
 }
 
-@keyframes pulse-animation {
-    0% { box-shadow: 0 0 0 0px rgba(37, 211, 102, 0.4); }
-    100% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+.nav-item {
+    background: none;
+    border: none;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: 0.3s;
 }
 
-/* Panneau de Test (Discret) */
-.omar-test-panel {
-    margin-top: 30px;
-    opacity: 0.4;
-    transition: opacity 0.3s;
+.nav-item.active {
+    color: #fff;
 }
 
-.omar-test-panel:hover { opacity: 1; }
-
-.omar-btn {
-    transition: transform 0.1s;
-}
-
-.omar-btn:active { transform: scale(0.95); }
+.nav-icon { font-size: 20px; }
+.nav-text { font-size: 9px; margin-top: 4px; letter-spacing: 1px; }
