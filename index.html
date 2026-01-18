@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <title>OMAR SOUVERAIN — Mobile Mirror</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="omar-logo-512.jpeg">
     <meta name="theme-color" content="#050505">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,85 +16,95 @@
         <header class="omar-header">
             <img src="omar-logo-512.jpeg" alt="OMAR Logo" class="omar-logo">
             <div class="omar-title-block">
-                <h1 class="omar-title">OMAR SOUVERAIN</h1>
-                <p class="omar-subtitle">NEXUS CRYSTAL — Vision Mobile</p>
+                <h1 class="omar-title" id="current-view-title">MIROIR TEMPS RÉEL</h1>
+                <p class="omar-subtitle">NEXUS CRYSTAL — Mobile</p>
             </div>
         </header>
 
-        <main class="omar-main">
+        <main id="view-mirror" class="omar-main view active">
             <section class="omar-card" id="omar-card">
                 <div class="omar-card-header">
-                    <span class="omar-badge" id="omar-decision-badge">NEUTRAL</span>
-                    <span class="omar-tag" id="omar-profile-tag">SOUVERAIN</span>
+                    <span class="omar-badge" id="omar-decision-badge">SYNCHRONISATION...</span>
+                    <span class="omar-tag">SOUVERAIN</span>
                 </div>
 
                 <div class="omar-index-block">
-                    <span class="omar-index-label">OMAR INDEX</span>
-                    <span class="omar-index-value" id="omar-index">50</span>
+                    <span class="omar-index-label">RISQUE GLOBAL</span>
+                    <span class="omar-index-value" id="omar-index">--</span>
                 </div>
 
                 <div class="omar-asset-monitor">
                     <div class="asset-row">
-                        <span class="asset-symbol">CVS.NE</span>
-                        <span class="asset-qty">0.5442 SHARES</span>
+                        <span class="asset-symbol">PATRIMOINE</span>
+                        <span class="asset-qty" id="total-assets-val">LECTURE FIREBASE...</span>
                     </div>
-                    <div class="asset-status" id="omar-asset-status">STABLE</div>
                 </div>
 
                 <div class="omar-grid">
                     <div class="omar-grid-item">
                         <span class="omar-grid-label">Régime</span>
-                        <span class="omar-grid-value" id="omar-regime">NEUTRAL</span>
+                        <span class="omar-grid-value" id="omar-regime">--</span>
                     </div>
                     <div class="omar-grid-item">
                         <span class="omar-grid-label">Stress</span>
-                        <span class="omar-grid-value" id="omar-stress">1.2 %</span>
-                    </div>
-                    <div class="omar-grid-item">
-                        <span class="omar-grid-label">Stress Level</span>
-                        <span class="omar-grid-value" id="omar-stress-level">STABLE</span>
-                    </div>
-                    <div class="omar-grid-item">
-                        <span class="omar-grid-label">Risk Level</span>
-                        <span class="omar-grid-value" id="omar-risk-level">MODERATE</span>
+                        <span class="omar-grid-value" id="omar-stress">--</span>
                     </div>
                 </div>
 
                 <div class="omar-footer-row">
-                    <span class="omar-status-dot" id="omar-status-dot"></span>
-                    <span class="omar-status-text" id="omar-status-text">
-                        En attente du Nexus...
-                    </span>
-                </div>
-
-                <div class="omar-footer-meta">
-                    <span id="omar-last-update">Dernière mise à jour : —</span>
+                    <span class="omar-status-dot pulse" id="omar-status-dot"></span>
+                    <span class="omar-status-text" id="omar-status-text">Lien Firebase Actif</span>
                 </div>
             </section>
 
             <section class="omar-council-card">
-                <h3>CONSEIL SOUVERAIN</h3>
-                <p id="omar-council-directive">En attente de directive majeure...</p>
-            </section>
-
-            <section class="omar-test-panel">
-                <div class="omar-buttons-row">
-                    <button class="omar-btn risk-on" data-scenario="RISK_ON">RISK_ON</button>
-                    <button class="omar-btn hedge" data-scenario="HEDGE">HEDGE</button>
-                    <button class="omar-btn risk-off" data-scenario="RISK_OFF">RISK_OFF</button>
-                    <button class="omar-btn crisis" data-scenario="CRISIS">CRISIS</button>
-                </div>
+                <h3>DERNIÈRE DIRECTIVE</h3>
+                <p id="omar-council-directive">Écoute du Nexus en cours...</p>
             </section>
         </main>
+
+        <main id="view-chat" class="omar-main view">
+            <div class="chat-container">
+                <div id="chat-history" class="chat-history">
+                    <div class="bot-msg">Je suis prêt, Monsieur. De quoi souhaitez-vous m'entretenir ?</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="user-input" placeholder="Votre instruction..." autocomplete="off">
+                    <button id="send-btn">TRANSNET</button>
+                </div>
+            </div>
+        </main>
+
+        <nav class="omar-nav">
+            <button class="nav-item active" onclick="switchView('mirror')">
+                <span class="nav-icon">◈</span>
+                <span class="nav-text">MIROIR</span>
+            </button>
+            <button class="nav-item" onclick="switchView('chat')">
+                <span class="nav-icon">▣</span>
+                <span class="nav-text">CONSEIL</span>
+            </button>
+        </nav>
     </div>
 
     <script type="module" src="app.js"></script>
-
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker.register("service-worker.js");
             });
+        }
+
+        // Logique de navigation simple
+        function switchView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            document.getElementById('view-' + viewName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            document.getElementById('current-view-title').innerText = 
+                viewName === 'mirror' ? 'MIROIR TEMPS RÉEL' : 'CONSEIL SOUVERAIN';
         }
     </script>
 </body>
