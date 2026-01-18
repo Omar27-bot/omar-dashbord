@@ -1,18 +1,21 @@
 {
-  "name": "OMAR HUD Mobile",
-  "short_name": "OMAR HUD",
-  "start_url": "/index.html",
-  "scope": "/",
+  "name": "O.M.A.R ZENITH SOUVERAIN",
+  "short_name": "OMAR",
+  "description": "Interface mobile du Nexus Intelligence V10 - Surveillance des actifs",
+  "start_url": "./index.html",
+  "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "dir": "ltr",
+  "lang": "fr-CA",
   "icons": [
     {
       "src": "omar-logo-512.jpeg",
       "sizes": "512x512",
       "type": "image/jpeg",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
