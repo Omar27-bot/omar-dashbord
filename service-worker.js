@@ -1,9 +1,11 @@
 /* ============================================================
-   O.M.A.R — SERVICE WORKER V11 (STABILITÉ SOUVERAINE)
-   Assure la disponibilité du miroir en toute circonstance.
+   O.M.A.R — SERVICE WORKER V12 (FORCE UPDATE)
+   Protocole de rafraîchissement souverain.
    ============================================================ */
 
-const CACHE_NAME = "omar-zenith-cache-v11";
+// Monsieur, en passant en V12, le navigateur invalidera l'ancien cache.
+const CACHE_NAME = "omar-zenith-cache-v12"; 
+
 const ASSETS = [
     "./",
     "./index.html",
@@ -13,18 +15,18 @@ const ASSETS = [
     "./omar-logo-512.jpeg"
 ];
 
-// --- INSTALLATION : Mise en coffre des ressources ---
+// --- INSTALLATION : Chargement du nouveau décor ---
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            console.log("[SW] Archivage des actifs institutionnels...");
+            console.log("[SW] Archivage de la Version 12...");
             return cache.addAll(ASSETS);
         })
     );
     self.skipWaiting();
 });
 
-// --- ACTIVATION : Purge des anciens protocoles ---
+// --- ACTIVATION : Suppression de la V11 et des précédentes ---
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys().then(keys => {
@@ -32,18 +34,18 @@ self.addEventListener("activate", event => {
                 keys
                     .filter(key => key !== CACHE_NAME)
                     .map(key => {
-                        console.log("[SW] Suppression de l'ancienne version :", key);
+                        console.log("[SW] Élimination des anciens protocoles :", key);
                         return caches.delete(key);
                     })
             );
         })
     );
+    // Force la prise de contrôle immédiate
     self.clients.claim();
 });
 
-// --- STRATÉGIE DE RÉCUPÉRATION (FETCH) ---
+// --- FETCH : Priorité au temps réel pour Firebase ---
 self.addEventListener("fetch", event => {
-    // Pour les requêtes Firebase/API, on tente le réseau d'abord pour avoir le temps réel
     if (event.request.url.includes("firebase") || event.request.url.includes("firestore")) {
         event.respondWith(
             fetch(event.request).catch(() => caches.match(event.request))
@@ -51,7 +53,6 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // Pour les fichiers statiques (images, css), on utilise le cache d'abord (vitesse)
     event.respondWith(
         caches.match(event.request).then(response => {
             return response || fetch(event.request);
