@@ -2,15 +2,15 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OMAR HUD Mobile</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMAR SOUVERAIN — Mobile Mirror</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="omar-logo-512.jpeg">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#050505">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,8 +18,8 @@
         <header class="omar-header">
             <img src="omar-logo-512.jpeg" alt="OMAR Logo" class="omar-logo">
             <div class="omar-title-block">
-                <h1 class="omar-title">OMAR HUD</h1>
-                <p class="omar-subtitle">ZENITH — Mobile Vision</p>
+                <h1 class="omar-title">OMAR SOUVERAIN</h1>
+                <p class="omar-subtitle">NEXUS CRYSTAL — Vision Mobile</p>
             </div>
         </header>
 
@@ -27,12 +27,20 @@
             <section class="omar-card" id="omar-card">
                 <div class="omar-card-header">
                     <span class="omar-badge" id="omar-decision-badge">NEUTRAL</span>
-                    <span class="omar-tag" id="omar-profile-tag">PROFILE: DAY</span>
+                    <span class="omar-tag" id="omar-profile-tag">SOUVERAIN</span>
                 </div>
 
                 <div class="omar-index-block">
                     <span class="omar-index-label">OMAR INDEX</span>
                     <span class="omar-index-value" id="omar-index">50</span>
+                </div>
+
+                <div class="omar-asset-monitor">
+                    <div class="asset-row">
+                        <span class="asset-symbol">CVS.NE</span>
+                        <span class="asset-qty">0.5442 SHARES</span>
+                    </div>
+                    <div class="asset-status" id="omar-asset-status">STABLE</div>
                 </div>
 
                 <div class="omar-grid">
@@ -46,7 +54,7 @@
                     </div>
                     <div class="omar-grid-item">
                         <span class="omar-grid-label">Stress Level</span>
-                        <span class="omar-grid-value" id="omar-stress-level">MEDIUM</span>
+                        <span class="omar-grid-value" id="omar-stress-level">STABLE</span>
                     </div>
                     <div class="omar-grid-item">
                         <span class="omar-grid-label">Risk Level</span>
@@ -57,7 +65,7 @@
                 <div class="omar-footer-row">
                     <span class="omar-status-dot" id="omar-status-dot"></span>
                     <span class="omar-status-text" id="omar-status-text">
-                        En attente de données…
+                        En attente du Nexus...
                     </span>
                 </div>
 
@@ -66,10 +74,12 @@
                 </div>
             </section>
 
-            <!-- Bloc de test local (peut être retiré en prod) -->
+            <section class="omar-council-card">
+                <h3>CONSEIL SOUVERAIN</h3>
+                <p id="omar-council-directive">En attente de directive majeure...</p>
+            </section>
+
             <section class="omar-test-panel">
-                <h2>Mode Démo</h2>
-                <p>Simule des scénarios OMAR pour tester le HUD mobile.</p>
                 <div class="omar-buttons-row">
                     <button class="omar-btn risk-on" data-scenario="RISK_ON">RISK_ON</button>
                     <button class="omar-btn hedge" data-scenario="HEDGE">HEDGE</button>
@@ -80,13 +90,13 @@
         </main>
     </div>
 
-    <!-- App logic -->
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 
-    <!-- Service Worker -->
     <script>
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("service_worker.js");
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("service-worker.js");
+            });
         }
     </script>
 </body>
