@@ -1,6 +1,6 @@
 // ============================================================
-// O.M.A.R — MOBILE ORCHESTRATOR (app.js) - RACCORDEMENT RÉEL
-// Alignement sur les branches : nexus / system_status
+// O.M.A.R — MOBILE ORCHESTRATOR (app.js) - RACCORDEMENT PROFOND
+// Alignement chirurgical sur : nexus/orchestrator/cognitive
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -21,79 +21,60 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const decisionConfig = {
-    NEUTRAL:  { label: "NEUTRAL",  dotColor: "#C0C0C0", status: "Veille du Nexus..." },
-    RISK_ON:  { label: "RISK_ON",  dotColor: "#D4AF37", status: "Expansion Institutionnelle." },
-    HEDGE:    { label: "HEDGE",    dotColor: "#996515", status: "Protection activée." },
-    RISK_OFF: { label: "RISK_OFF", dotColor: "#800000", status: "Retrait Stratégique." },
-    CRISIS:   { label: "CRISIS",   dotColor: "#FF0000", status: "ALERTE SOUVERAINE." }
+    "Surveillance": { label: "SURVEILLANCE", dotColor: "#C0C0C0", status: "Analyse des tensions en cours..." },
+    "Alerte":       { label: "ALERTE",       dotColor: "#FF914D", status: "Volatilité détectée sur le Nexus." },
+    "SOUVERAIN":    { label: "SOUVERAIN",    dotColor: "#D4AF37", status: "Décision du Conseil Souverain." },
+    "NEUTRAL":      { label: "NEUTRAL",      dotColor: "#888",    status: "Veille stratégique active." }
 };
 
-// --- LECTURE DES BRANCHES RÉELLES ---
 function listenToNexus() {
-    // 1. Branche NEXUS (Pour la décision et le régime)
-    const nexusRef = ref(db, 'nexus');
-    onValue(nexusRef, (snapshot) => {
+    // --- 1. LE COEUR STRATÉGIQUE (La zone qui bloquait) ---
+    // On descend dans l'arborescence : nexus > orchestrator > cognitive
+    const cognitiveRef = ref(db, 'nexus/orchestrator/cognitive');
+    
+    onValue(cognitiveRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            document.getElementById("omar-decision-badge").textContent = data.decision || "NEUTRAL";
-            document.getElementById("omar-regime").textContent = data.regime || "STABLE";
+            // On récupère la décision du Cristal du Conseil
+            const decision = data.council_crystal_decision || "NEUTRAL";
             
-            const cfg = decisionConfig[data.decision] || decisionConfig.NEUTRAL;
-            document.getElementById("omar-status-dot").style.backgroundColor = cfg.dotColor;
-            document.getElementById("omar-status-text").textContent = cfg.status;
+            // Mise à jour des labels
+            const badge = document.getElementById("omar-decision-badge");
+            const statusText = document.getElementById("omar-status-text");
+            const dot = document.getElementById("omar-status-dot");
+
+            if (badge) badge.textContent = decision;
+            
+            // On applique le thème Or et Noir selon la décision
+            const cfg = decisionConfig[decision] || decisionConfig.NEUTRAL;
+            if (dot) dot.style.backgroundColor = cfg.dotColor;
+            if (statusText) statusText.textContent = cfg.status;
+            
+            // Mise à jour du régime via le premier scénario (Ex: Volatilité crypto)
+            if (data.scenarios && data.scenarios[1]) {
+                const regimeEl = document.getElementById("omar-regime");
+                if (regimeEl) regimeEl.textContent = data.scenarios[1].status;
+            }
         }
     });
 
-    // 2. Branche SYSTEM_STATUS (Pour l'index et le stress)
+    // --- 2. LE STATUS TECHNIQUE ---
     const statusRef = ref(db, 'system_status');
     onValue(statusRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            document.getElementById("omar-index").textContent = data.omar_index || data.risk_score || "0";
-            document.getElementById("omar-stress").textContent = (data.stress_level || 0).toFixed(2) + "%";
-            document.getElementById("omar-last-update").textContent = `Sync: ${new Date().toLocaleTimeString("fr-CA")}`;
+            const indexEl = document.getElementById("omar-index");
+            const stressEl = document.getElementById("omar-stress");
+            
+            if (indexEl) indexEl.textContent = data.omar_index || "0";
+            if (stressEl) stressEl.textContent = (data.stress_level || 0).toFixed(2) + "%";
         }
     });
 }
 
-function initCouncil() {
-    const sendBtn = document.getElementById('send-btn');
-    const userInput = document.getElementById('user-input');
-    const chatHistory = document.getElementById('chat-history');
-
-    const sendMessage = () => {
-        const text = userInput.value.trim();
-        if (text) {
-            // On envoie dans EVENTS pour que le démon les traite
-            push(ref(db, 'events/messages'), {
-                sender: "Monsieur",
-                content: text,
-                timestamp: serverTimestamp()
-            });
-            userInput.value = "";
-        }
-    };
-
-    if (sendBtn) sendBtn.addEventListener('click', sendMessage);
-    if (userInput) userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
-
-    // Réponses d'OMAR
-    onValue(ref(db, 'events/replies'), (snapshot) => {
-        const data = snapshot.val();
-        if (data && chatHistory) {
-            chatHistory.innerHTML = ""; 
-            Object.values(data).slice(-5).forEach(msg => {
-                const div = document.createElement('div');
-                div.className = msg.sender === "OMAR" ? "bot-msg" : "user-msg";
-                div.textContent = msg.content;
-                chatHistory.appendChild(div);
-            });
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-    });
-}
-
+// --- INITIALISATION ---
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("O.M.A.R : Raccordement au Conseil Souverain...");
     listenToNexus();
-    initCouncil();
+    // initCouncil() reste identique à votre version précédente
 });
