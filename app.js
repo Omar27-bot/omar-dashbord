@@ -1,6 +1,6 @@
 // ============================================================
-// O.M.A.R — MOBILE ORCHESTRATOR (app.js) - RACCORDEMENT PROFOND
-// Alignement chirurgical sur : nexus/orchestrator/cognitive
+// O.M.A.R — ZENITH MOBILE ORCHESTRATOR (app.js)
+// Mode : Souverain / Institutionnel Premium
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -20,61 +20,108 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const decisionConfig = {
-    "Surveillance": { label: "SURVEILLANCE", dotColor: "#C0C0C0", status: "Analyse des tensions en cours..." },
-    "Alerte":       { label: "ALERTE",       dotColor: "#FF914D", status: "Volatilité détectée sur le Nexus." },
-    "SOUVERAIN":    { label: "SOUVERAIN",    dotColor: "#D4AF37", status: "Décision du Conseil Souverain." },
-    "NEUTRAL":      { label: "NEUTRAL",      dotColor: "#888",    status: "Veille stratégique active." }
+// --- CONFIGURATION DES ÉTATS (OR ET NOIR) ---
+const UI_THEME = {
+    "Alerte":      { color: "#D4AF37", label: "ALERTE SOUVERAINE", icon: "⚠️" },
+    "Surveillance": { color: "#C0C0C0", label: "SURVEILLANCE", icon: "👁️" },
+    "RISK_ON":     { color: "#D4AF37", label: "EXPANSION", icon: "📈" },
+    "DEFAULT":     { color: "#888",    label: "ANALYSE", icon: "⚙️" }
 };
 
-function listenToNexus() {
-    // --- 1. LE COEUR STRATÉGIQUE (La zone qui bloquait) ---
-    // On descend dans l'arborescence : nexus > orchestrator > cognitive
-    const cognitiveRef = ref(db, 'nexus/orchestrator/cognitive');
-    
-    onValue(cognitiveRef, (snapshot) => {
+// --- 1. VIE DU NEXUS (SYSTÈME ET SCÉNARIOS) ---
+function syncNexusLife() {
+    // Branche Cognitive (Le Cerveau)
+    onValue(ref(db, 'nexus/orchestrator/cognitive'), (snapshot) => {
         const data = snapshot.val();
-        if (data) {
-            // On récupère la décision du Cristal du Conseil
-            const decision = data.council_crystal_decision || "NEUTRAL";
-            
-            // Mise à jour des labels
-            const badge = document.getElementById("omar-decision-badge");
-            const statusText = document.getElementById("omar-status-text");
-            const dot = document.getElementById("omar-status-dot");
+        if (!data) return;
 
-            if (badge) badge.textContent = decision;
-            
-            // On applique le thème Or et Noir selon la décision
-            const cfg = decisionConfig[decision] || decisionConfig.NEUTRAL;
-            if (dot) dot.style.backgroundColor = cfg.dotColor;
-            if (statusText) statusText.textContent = cfg.status;
-            
-            // Mise à jour du régime via le premier scénario (Ex: Volatilité crypto)
-            if (data.scenarios && data.scenarios[1]) {
-                const regimeEl = document.getElementById("omar-regime");
-                if (regimeEl) regimeEl.textContent = data.scenarios[1].status;
-            }
+        // Mise à jour de la Décision Centrale
+        const decision = data.council_crystal_decision || "NEUTRAL";
+        const theme = UI_THEME[decision] || UI_THEME["DEFAULT"];
+
+        updateElement("omar-decision-badge", theme.label);
+        updateElement("omar-status-text", `Conseil : ${decision}`);
+        const dot = document.getElementById("omar-status-dot");
+        if (dot) dot.style.backgroundColor = theme.color;
+
+        // Injection des Scénarios dans la zone "Régime" ou "Alertes"
+        if (data.scenarios) {
+            const scenarioList = Object.values(data.scenarios);
+            const mainScenario = scenarioList[1] || scenarioList[0]; // Priorité au Global
+            updateElement("omar-regime", `${mainScenario.title} : ${mainScenario.status}`);
+            updateElement("omar-index", (mainScenario.score * 100).toFixed(0));
         }
     });
 
-    // --- 2. LE STATUS TECHNIQUE ---
-    const statusRef = ref(db, 'system_status');
-    onValue(statusRef, (snapshot) => {
+    // Branche Status Technique
+    onValue(ref(db, 'system_status'), (snapshot) => {
         const data = snapshot.val();
-        if (data) {
-            const indexEl = document.getElementById("omar-index");
-            const stressEl = document.getElementById("omar-stress");
-            
-            if (indexEl) indexEl.textContent = data.omar_index || "0";
-            if (stressEl) stressEl.textContent = (data.stress_level || 0).toFixed(2) + "%";
-        }
+        if (!data) return;
+        updateElement("omar-stress", (data.stress_level || 0).toFixed(2) + "%");
     });
+}
+
+// --- 2. O.M.A.R CHAT (LE CONSEIL SOUVERAIN) ---
+function syncCouncilChat() {
+    const chatHistory = document.getElementById('chat-history');
+    if (!chatHistory) return;
+
+    // Écoute des messages (Events)
+    onValue(ref(db, 'events'), (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        chatHistory.innerHTML = ""; // Nettoyage pour fresh start
+
+        // On fusionne et trie les messages et les réponses par timestamp
+        const allMsgs = [];
+        if (data.messages) Object.values(data.messages).forEach(m => allMsgs.push({...m, type: 'user'}));
+        if (data.replies) Object.values(data.replies).forEach(r => allMsgs.push({...r, type: 'bot'}));
+        
+        allMsgs.sort((a, b) => a.timestamp - b.timestamp);
+
+        allMsgs.slice(-6).forEach(msg => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = msg.type === 'bot' ? 'bot-msg' : 'user-msg';
+            msgDiv.innerHTML = `
+                <span style="color: #D4AF37; font-size: 0.7em;">${msg.sender || 'SYS'}</span><br>
+                ${msg.content}
+            `;
+            chatHistory.appendChild(msgDiv);
+        });
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    });
+}
+
+// --- HELPER FONCTION ---
+function updateElement(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('fade-in'); // Animation de vie
+        el.textContent = value;
+        setTimeout(() => el.classList.remove('fade-in'), 500);
+    }
 }
 
 // --- INITIALISATION ---
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("O.M.A.R : Raccordement au Conseil Souverain...");
-    listenToNexus();
-    // initCouncil() reste identique à votre version précédente
+    syncNexusLife();
+    syncCouncilChat();
+    
+    // Interaction Envoi
+    const input = document.getElementById('user-input');
+    const btn = document.getElementById('send-btn');
+    
+    const send = () => {
+        if (!input.value.trim()) return;
+        push(ref(db, 'events/messages'), {
+            sender: "Monsieur",
+            content: input.value,
+            timestamp: serverTimestamp()
+        });
+        input.value = "";
+    };
+
+    if (btn) btn.onclick = send;
+    if (input) input.onkeypress = (e) => { if(e.key === 'Enter') send(); };
 });
