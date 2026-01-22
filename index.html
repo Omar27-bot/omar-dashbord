@@ -2,110 +2,69 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OMAR SOUVERAIN — Mobile Mirror</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="omar-logo-512.jpeg">
-    <meta name="theme-color" content="#050505">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O.M.A.R — ZENITH MOBILE</title>
+    <link rel="stylesheet" href="style.css"> <style>
+        :root { --gold: #D4AF37; --black: #0a0a0a; --gray: #1a1a1a; }
+        body { background: var(--black); color: white; font-family: 'Consolas', monospace; margin: 0; padding: 20px; }
+        .hud-container { border: 1px solid var(--gold); padding: 20px; border-radius: 8px; background: linear-gradient(145deg, #111, #050505); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .gold { color: var(--gold); }
+        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; background-color: #444; margin-right: 10px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .stat-card { background: var(--gray); padding: 15px; border-radius: 4px; border-left: 3px solid var(--gold); }
+        .value { display: block; font-size: 1.5em; font-weight: bold; margin-top: 5px; }
+        #chat-history { height: 200px; overflow-y: auto; background: #000; padding: 10px; border: 1px solid #333; margin: 10px 0; font-size: 0.85em; }
+        .bot-msg { color: var(--gold); margin-bottom: 8px; border-bottom: 1px opacity 0.1 solid var(--gold); }
+        .user-msg { color: #eee; margin-bottom: 8px; text-align: right; }
+        input { width: 80%; background: #222; border: 1px solid #444; color: white; padding: 8px; }
+        button { width: 15%; background: var(--gold); border: none; padding: 8px; cursor: pointer; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <header class="omar-header">
-            <img src="omar-logo-512.jpeg" alt="OMAR Logo" class="omar-logo">
-            <div class="omar-title-block">
-                <h1 class="omar-title" id="current-view-title">MIROIR TEMPS RÉEL</h1>
-                <p class="omar-subtitle">NEXUS CRYSTAL — Mobile</p>
-            </div>
-        </header>
 
-        <main id="view-mirror" class="omar-main view active">
-            <section class="omar-card" id="omar-card">
-                <div class="omar-card-header">
-                    <span class="omar-badge" id="omar-decision-badge">SYNCHRONISATION...</span>
-                    <span class="omar-tag">SOUVERAIN</span>
-                </div>
-
-                <div class="omar-index-block">
-                    <span class="omar-index-label">RISQUE GLOBAL</span>
-                    <span class="omar-index-value" id="omar-index">--</span>
-                </div>
-
-                <div class="omar-asset-monitor">
-                    <div class="asset-row">
-                        <span class="asset-symbol">PATRIMOINE</span>
-                        <span class="asset-qty" id="total-assets-val">LECTURE FIREBASE...</span>
-                    </div>
-                </div>
-
-                <div class="omar-grid">
-                    <div class="omar-grid-item">
-                        <span class="omar-grid-label">Régime</span>
-                        <span class="omar-grid-value" id="omar-regime">--</span>
-                    </div>
-                    <div class="omar-grid-item">
-                        <span class="omar-grid-label">Stress</span>
-                        <span class="omar-grid-value" id="omar-stress">--</span>
-                    </div>
-                </div>
-
-                <div class="omar-footer-row">
-                    <span class="omar-status-dot pulse" id="omar-status-dot"></span>
-                    <span class="omar-status-text" id="omar-status-text">Lien Firebase Actif</span>
-                </div>
-            </section>
-
-            <section class="omar-council-card">
-                <h3>DERNIÈRE DIRECTIVE</h3>
-                <p id="omar-council-directive">Écoute du Nexus en cours...</p>
-            </section>
-        </main>
-
-        <main id="view-chat" class="omar-main view">
-            <div class="chat-container">
-                <div id="chat-history" class="chat-history">
-                    <div class="bot-msg">Je suis prêt, Monsieur. De quoi souhaitez-vous m'entretenir ?</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="user-input" placeholder="Votre instruction..." autocomplete="off">
-                    <button id="send-btn">TRANSNET</button>
-                </div>
-            </div>
-        </main>
-
-        <nav class="omar-nav">
-            <button class="nav-item active" onclick="switchView('mirror')">
-                <span class="nav-icon">◈</span>
-                <span class="nav-text">MIROIR</span>
-            </button>
-            <button class="nav-item" onclick="switchView('chat')">
-                <span class="nav-icon">▣</span>
-                <span class="nav-text">CONSEIL</span>
-            </button>
-        </nav>
+<div class="hud-container">
+    <div class="header">
+        <div>
+            <span id="omar-status-dot" class="dot"></span>
+            <span id="omar-decision-badge" class="gold">INITIALISATION</span>
+        </div>
+        <small id="omar-last-update">Sync en cours...</small>
     </div>
 
-    <script type="module" src="app.js"></script>
-    <script>
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("service-worker.js");
-            });
-        }
+    <h2 style="text-align:center; letter-spacing: 2px;">MIROIR TEMPS RÉEL</h2>
 
-        // Logique de navigation simple
-        function switchView(viewName) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            
-            document.getElementById('view-' + viewName).classList.add('active');
-            event.currentTarget.classList.add('active');
-            
-            document.getElementById('current-view-title').innerText = 
-                viewName === 'mirror' ? 'MIROIR TEMPS RÉEL' : 'CONSEIL SOUVERAIN';
-        }
-    </script>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <small>RISQUE GLOBAL</small>
+            <span id="omar-index" class="value">--</span>
+        </div>
+        <div class="stat-card">
+            <small>PATRIMOINE</small>
+            <span id="omar-patrimoine" class="value gold">SOUVERAIN</span>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <div class="stat-card" style="border-left-color: #444;">
+            <p>Régime : <span id="omar-regime" class="gold">--</span></p>
+            <p>Stress : <span id="omar-stress" class="gold">--</span></p>
+        </div>
+    </div>
+
+    <div class="directive-box" style="background: rgba(212,175,55,0.05); padding: 15px; border: 1px dashed var(--gold);">
+        <small class="gold">DERNIÈRE DIRECTIVE</small>
+        <p id="omar-status-text" style="margin: 5px 0;">Attente du signal Nexus...</p>
+    </div>
+
+    <h3 class="gold" style="margin-top:25px;">O.M.A.R — CONSEIL</h3>
+    <div id="chat-history"></div>
+    <div style="display: flex; justify-content: space-between;">
+        <input type="text" id="user-input" placeholder="Ordre souverain...">
+        <button id="send-btn">SEND</button>
+    </div>
+</div>
+
+<script type="module" src="app.js"></script>
 </body>
 </html>
