@@ -1,8 +1,3 @@
-// ============================================================
-// O.M.A.R — ZENITH MOBILE ORCHESTRATOR (app.js)
-// Mode : Souverain / Institutionnel Premium
-// ============================================================
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
@@ -13,106 +8,62 @@ const firebaseConfig = {
     projectId: "omar-system",
     storageBucket: "omar-system.firebasestorage.app",
     messagingSenderId: "571385162146",
-    appId: "1:571385162146:web:6763c7f74f02fc0f2ceafb",
-    measurementId: "G-8KMSZ5DVSS"
+    appId: "1:571385162146:web:6763c7f74f02fc0f2ceafb"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// --- CONFIGURATION DES ÉTATS (OR ET NOIR) ---
-const UI_THEME = {
-    "Alerte":      { color: "#D4AF37", label: "ALERTE SOUVERAINE", icon: "⚠️" },
-    "Surveillance": { color: "#C0C0C0", label: "SURVEILLANCE", icon: "👁️" },
-    "RISK_ON":     { color: "#D4AF37", label: "EXPANSION", icon: "📈" },
-    "DEFAULT":     { color: "#888",    label: "ANALYSE", icon: "⚙️" }
+// Thème de décision
+const THEME = {
+    "Alerte": { color: "#FF4B4B", msg: "Vigilance accrue requise." },
+    "Surveillance": { color: "#D4AF37", msg: "Analyse des flux stable." },
+    "Normal": { color: "#25D366", msg: "Opérations nominales." }
 };
 
-// --- 1. VIE DU NEXUS (SYSTÈME ET SCÉNARIOS) ---
-function syncNexusLife() {
-    // Branche Cognitive (Le Cerveau)
-    onValue(ref(db, 'nexus/orchestrator/cognitive'), (snapshot) => {
+// --- SYNCHRONISATION DU MIROIR ---
+function startMiroir() {
+    const cognitiveRef = ref(db, 'nexus/orchestrator/cognitive');
+    
+    onValue(cognitiveRef, (snapshot) => {
         const data = snapshot.val();
-        if (!data) return;
+        if (data) {
+            // 1. Décision Cristal
+            const decision = data.council_crystal_decision || "VEILLE";
+            document.getElementById("omar-decision-badge").textContent = decision;
+            
+            // 2. Traitement des Scénarios (V11)
+            if (data.scenarios && data.scenarios[1]) {
+                const globalScn = data.scenarios[1];
+                document.getElementById("omar-regime").textContent = globalScn.title;
+                document.getElementById("omar-index").textContent = (globalScn.score * 100).toFixed(0);
+                
+                // Mise à jour de la directive basse
+                const info = THEME[globalScn.status] || THEME["Surveillance"];
+                document.getElementById("omar-status-text").textContent = `${globalScn.status} : ${info.msg}`;
+                document.getElementById("omar-status-dot").style.backgroundColor = info.color;
+            }
 
-        // Mise à jour de la Décision Centrale
-        const decision = data.council_crystal_decision || "NEUTRAL";
-        const theme = UI_THEME[decision] || UI_THEME["DEFAULT"];
-
-        updateElement("omar-decision-badge", theme.label);
-        updateElement("omar-status-text", `Conseil : ${decision}`);
-        const dot = document.getElementById("omar-status-dot");
-        if (dot) dot.style.backgroundColor = theme.color;
-
-        // Injection des Scénarios dans la zone "Régime" ou "Alertes"
-        if (data.scenarios) {
-            const scenarioList = Object.values(data.scenarios);
-            const mainScenario = scenarioList[1] || scenarioList[0]; // Priorité au Global
-            updateElement("omar-regime", `${mainScenario.title} : ${mainScenario.status}`);
-            updateElement("omar-index", (mainScenario.score * 100).toFixed(0));
+            document.getElementById("omar-last-update").textContent = new Date().toLocaleTimeString();
         }
     });
 
-    // Branche Status Technique
+    // Branche technique
     onValue(ref(db, 'system_status'), (snapshot) => {
-        const data = snapshot.val();
-        if (!data) return;
-        updateElement("omar-stress", (data.stress_level || 0).toFixed(2) + "%");
+        const technical = snapshot.val();
+        if (technical) {
+            document.getElementById("omar-stress").textContent = (technical.stress_level || 0).toFixed(2) + "%";
+        }
     });
 }
 
-// --- 2. O.M.A.R CHAT (LE CONSEIL SOUVERAIN) ---
-function syncCouncilChat() {
-    const chatHistory = document.getElementById('chat-history');
-    if (!chatHistory) return;
-
-    // Écoute des messages (Events)
-    onValue(ref(db, 'events'), (snapshot) => {
-        const data = snapshot.val();
-        if (!data) return;
-
-        chatHistory.innerHTML = ""; // Nettoyage pour fresh start
-
-        // On fusionne et trie les messages et les réponses par timestamp
-        const allMsgs = [];
-        if (data.messages) Object.values(data.messages).forEach(m => allMsgs.push({...m, type: 'user'}));
-        if (data.replies) Object.values(data.replies).forEach(r => allMsgs.push({...r, type: 'bot'}));
-        
-        allMsgs.sort((a, b) => a.timestamp - b.timestamp);
-
-        allMsgs.slice(-6).forEach(msg => {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = msg.type === 'bot' ? 'bot-msg' : 'user-msg';
-            msgDiv.innerHTML = `
-                <span style="color: #D4AF37; font-size: 0.7em;">${msg.sender || 'SYS'}</span><br>
-                ${msg.content}
-            `;
-            chatHistory.appendChild(msgDiv);
-        });
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    });
-}
-
-// --- HELPER FONCTION ---
-function updateElement(id, value) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.classList.add('fade-in'); // Animation de vie
-        el.textContent = value;
-        setTimeout(() => el.classList.remove('fade-in'), 500);
-    }
-}
-
-// --- INITIALISATION ---
-document.addEventListener("DOMContentLoaded", () => {
-    syncNexusLife();
-    syncCouncilChat();
-    
-    // Interaction Envoi
+// --- CONSEIL SOUVERAIN (CHAT) ---
+function startCouncil() {
     const input = document.getElementById('user-input');
     const btn = document.getElementById('send-btn');
-    
-    const send = () => {
+    const history = document.getElementById('chat-history');
+
+    btn.onclick = () => {
         if (!input.value.trim()) return;
         push(ref(db, 'events/messages'), {
             sender: "Monsieur",
@@ -122,6 +73,27 @@ document.addEventListener("DOMContentLoaded", () => {
         input.value = "";
     };
 
-    if (btn) btn.onclick = send;
-    if (input) input.onkeypress = (e) => { if(e.key === 'Enter') send(); };
+    // Écoute des réponses combinées
+    onValue(ref(db, 'events'), (snapshot) => {
+        const events = snapshot.val();
+        if (!events) return;
+        
+        history.innerHTML = "";
+        let combined = [];
+        if (events.messages) Object.values(events.messages).forEach(m => combined.push({...m, role: 'user'}));
+        if (events.replies) Object.values(events.replies).forEach(r => combined.push({...r, role: 'bot'}));
+        
+        combined.sort((a,b) => a.timestamp - b.timestamp).slice(-10).forEach(msg => {
+            const div = document.createElement('div');
+            div.className = msg.role === 'bot' ? 'bot-msg' : 'user-msg';
+            div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
+            history.appendChild(div);
+        });
+        history.scrollTop = history.scrollHeight;
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    startMiroir();
+    startCouncil();
 });
