@@ -1,6 +1,6 @@
 // ============================================================
-// O.M.A.R — MOBILE ORCHESTRATOR (app.js) - VERSION CORRIGÉE
-// Pilotage du Miroir et du Conseil Souverain - MODE INSTITUTIONNEL
+// O.M.A.R — MOBILE ORCHESTRATOR (app.js) - RACCORDEMENT RÉEL
+// Alignement sur les branches : nexus / system_status
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -20,79 +20,42 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// --- ÉTAT GLOBAL ---
-const state = {
-    profile: "SOUVERAIN",
-    decision: "NEUTRAL",
-    omarIndex: 0,
-    regime: "INITIALISATION",
-    stress: 0,
-    lastUpdate: null
-};
-
-// --- CONFIGURATION INSTITUTIONNELLE (NOIR ET OR) ---
 const decisionConfig = {
-    NEUTRAL:  { label: "NEUTRAL",  dotColor: "#C0C0C0", status: "Analyse du Nexus en cours..." },
-    RISK_ON:  { label: "RISK_ON",  dotColor: "#D4AF37", status: "Marché favorable : Expansion active." }, // Or Premium
-    HEDGE:    { label: "HEDGE",    dotColor: "#996515", status: "Couverture de sécurité déployée." },    // Or Profond
-    RISK_OFF: { label: "RISK_OFF", dotColor: "#800000", status: "Prudence : Retrait stratégique." },      // Bordeaux Banquier
-    CRISIS:   { label: "CRISIS",   dotColor: "#FF0000", status: "ALERTE : Protection Souveraine !" }
+    NEUTRAL:  { label: "NEUTRAL",  dotColor: "#C0C0C0", status: "Veille du Nexus..." },
+    RISK_ON:  { label: "RISK_ON",  dotColor: "#D4AF37", status: "Expansion Institutionnelle." },
+    HEDGE:    { label: "HEDGE",    dotColor: "#996515", status: "Protection activée." },
+    RISK_OFF: { label: "RISK_OFF", dotColor: "#800000", status: "Retrait Stratégique." },
+    CRISIS:   { label: "CRISIS",   dotColor: "#FF0000", status: "ALERTE SOUVERAINE." }
 };
 
-// --- LOGIQUE DU MIROIR (Lecture du Flux Vivant) ---
+// --- LECTURE DES BRANCHES RÉELLES ---
 function listenToNexus() {
-    // Le chemin doit être identique à celui écrit par le démon Python
-    const nexusRef = ref(db, 'operational/hud_snapshot');
-    
+    // 1. Branche NEXUS (Pour la décision et le régime)
+    const nexusRef = ref(db, 'nexus');
     onValue(nexusRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            // Mise à jour de l'état avec repli sécurisé (fallback)
-            state.decision = data.decision || "NEUTRAL";
-            state.omarIndex = (data.risk && data.risk.risk_score) ? data.risk.risk_score : 0;
-            state.regime = (data.macro && data.macro.regime) ? data.macro.regime : "STABLE";
-            state.stress = (data.risk && data.risk.stress_level) ? data.risk.stress_level : 0;
-            state.lastUpdate = new Date();
+            document.getElementById("omar-decision-badge").textContent = data.decision || "NEUTRAL";
+            document.getElementById("omar-regime").textContent = data.regime || "STABLE";
             
-            renderMirror();
-        } else {
-            console.warn("Nexus : En attente de données de synchronisation...");
+            const cfg = decisionConfig[data.decision] || decisionConfig.NEUTRAL;
+            document.getElementById("omar-status-dot").style.backgroundColor = cfg.dotColor;
+            document.getElementById("omar-status-text").textContent = cfg.status;
         }
-    }, (error) => {
-        console.error("Erreur de raccordement Firebase :", error);
+    });
+
+    // 2. Branche SYSTEM_STATUS (Pour l'index et le stress)
+    const statusRef = ref(db, 'system_status');
+    onValue(statusRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            document.getElementById("omar-index").textContent = data.omar_index || data.risk_score || "0";
+            document.getElementById("omar-stress").textContent = (data.stress_level || 0).toFixed(2) + "%";
+            document.getElementById("omar-last-update").textContent = `Sync: ${new Date().toLocaleTimeString("fr-CA")}`;
+        }
     });
 }
 
-function renderMirror() {
-    const cfg = decisionConfig[state.decision] || decisionConfig.NEUTRAL;
-    
-    // Mise à jour du DOM
-    const elements = {
-        "omar-decision-badge": cfg.label,
-        "omar-index": state.omarIndex,
-        "omar-regime": state.regime,
-        "omar-stress": state.stress.toFixed(2) + "%",
-        "omar-status-text": cfg.status
-    };
-
-    // Injection sécurisée
-    for (const [id, value] of Object.entries(elements)) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value;
-    }
-
-    const dot = document.getElementById("omar-status-dot");
-    if (dot) dot.style.backgroundColor = cfg.dotColor;
-    
-    if (state.lastUpdate) {
-        const timeEl = document.getElementById("omar-last-update");
-        if (timeEl) {
-            timeEl.textContent = `Nexus Synchronisé : ${state.lastUpdate.toLocaleTimeString("fr-CA")}`;
-        }
-    }
-}
-
-// --- LOGIQUE DU CONSEIL (Dialogue Institutionnel) ---
 function initCouncil() {
     const sendBtn = document.getElementById('send-btn');
     const userInput = document.getElementById('user-input');
@@ -101,12 +64,11 @@ function initCouncil() {
     const sendMessage = () => {
         const text = userInput.value.trim();
         if (text) {
-            // Envoi vers la file d'attente du Démon
-            push(ref(db, 'interactions/messages'), {
+            // On envoie dans EVENTS pour que le démon les traite
+            push(ref(db, 'events/messages'), {
                 sender: "Monsieur",
                 content: text,
-                timestamp: serverTimestamp(),
-                profile: state.profile
+                timestamp: serverTimestamp()
             });
             userInput.value = "";
         }
@@ -115,16 +77,14 @@ function initCouncil() {
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
     if (userInput) userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
 
-    // Écoute des réponses d'OMAR
-    const chatRef = ref(db, 'interactions/replies');
-    onValue(chatRef, (snapshot) => {
+    // Réponses d'OMAR
+    onValue(ref(db, 'events/replies'), (snapshot) => {
         const data = snapshot.val();
         if (data && chatHistory) {
             chatHistory.innerHTML = ""; 
-            Object.values(data).forEach(msg => {
+            Object.values(data).slice(-5).forEach(msg => {
                 const div = document.createElement('div');
                 div.className = msg.sender === "OMAR" ? "bot-msg" : "user-msg";
-                div.style.borderLeft = msg.sender === "OMAR" ? "2px solid #D4AF37" : "none";
                 div.textContent = msg.content;
                 chatHistory.appendChild(div);
             });
@@ -133,9 +93,7 @@ function initCouncil() {
     });
 }
 
-// --- INITIALISATION ---
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("O.M.A.R HUD : Initialisation du raccordement Souverain...");
     listenToNexus();
     initCouncil();
 });
