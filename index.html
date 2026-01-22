@@ -2,64 +2,63 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>O.M.A.R — ZENITH MOBILE</title>
-    <link rel="stylesheet" href="style.css"> <style>
-        :root { --gold: #D4AF37; --black: #0a0a0a; --gray: #1a1a1a; }
-        body { background: var(--black); color: white; font-family: 'Consolas', monospace; margin: 0; padding: 20px; }
-        .hud-container { border: 1px solid var(--gold); padding: 20px; border-radius: 8px; background: linear-gradient(145deg, #111, #050505); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .gold { color: var(--gold); }
-        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; background-color: #444; margin-right: 10px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .stat-card { background: var(--gray); padding: 15px; border-radius: 4px; border-left: 3px solid var(--gold); }
-        .value { display: block; font-size: 1.5em; font-weight: bold; margin-top: 5px; }
-        #chat-history { height: 200px; overflow-y: auto; background: #000; padding: 10px; border: 1px solid #333; margin: 10px 0; font-size: 0.85em; }
-        .bot-msg { color: var(--gold); margin-bottom: 8px; border-bottom: 1px opacity 0.1 solid var(--gold); }
-        .user-msg { color: #eee; margin-bottom: 8px; text-align: right; }
-        input { width: 80%; background: #222; border: 1px solid #444; color: white; padding: 8px; }
-        button { width: 15%; background: var(--gold); border: none; padding: 8px; cursor: pointer; font-weight: bold; }
+    <style>
+        :root { --gold: #D4AF37; --black: #050505; --glass: rgba(255, 255, 255, 0.05); }
+        body { background: var(--black); color: white; font-family: 'Consolas', monospace; margin: 0; padding: 15px; overflow-x: hidden; }
+        .hud-card { border: 1px solid var(--gold); background: linear-gradient(145deg, #0a0a0a, #111); padding: 20px; border-radius: 12px; box-shadow: 0 0 20px rgba(212, 175, 55, 0.1); }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; }
+        .gold { color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { background: var(--glass); padding: 15px; border-radius: 4px; border-left: 2px solid var(--gold); }
+        .value { display: block; font-size: 1.8em; font-weight: bold; margin-top: 5px; }
+        .directive-zone { margin-top: 20px; padding: 15px; background: rgba(212, 175, 55, 0.03); border: 1px dashed #333; }
+        #chat-history { height: 180px; overflow-y: auto; font-size: 0.85em; margin: 15px 0; border-left: 1px solid #222; padding-left: 10px; }
+        .bot-msg { color: var(--gold); margin-bottom: 10px; }
+        .user-msg { color: #888; margin-bottom: 10px; text-align: right; }
+        .input-group { display: flex; gap: 5px; }
+        input { flex-grow: 1; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 4px; }
+        button { background: var(--gold); border: none; padding: 10px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="hud-container">
+<div class="hud-card">
     <div class="header">
-        <div>
-            <span id="omar-status-dot" class="dot"></span>
-            <span id="omar-decision-badge" class="gold">INITIALISATION</span>
-        </div>
-        <small id="omar-last-update">Sync en cours...</small>
+        <span class="gold" id="omar-decision-badge">SYNCHRONISATION...</span>
+        <small id="omar-last-update">Lien Firebase Actif</small>
     </div>
 
-    <h2 style="text-align:center; letter-spacing: 2px;">MIROIR TEMPS RÉEL</h2>
-
     <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-box">
             <small>RISQUE GLOBAL</small>
             <span id="omar-index" class="value">--</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-box">
             <small>PATRIMOINE</small>
             <span id="omar-patrimoine" class="value gold">SOUVERAIN</span>
         </div>
     </div>
 
-    <div style="margin-bottom: 20px;">
-        <div class="stat-card" style="border-left-color: #444;">
-            <p>Régime : <span id="omar-regime" class="gold">--</span></p>
-            <p>Stress : <span id="omar-stress" class="gold">--</span></p>
+    <div class="stats-grid" style="margin-top: 10px;">
+        <div class="stat-box" style="border-left-color: #333;">
+            <small>Régime</small>
+            <span id="omar-regime" style="display:block; font-size: 0.9em; margin-top:5px;">En attente...</span>
+        </div>
+        <div class="stat-box" style="border-left-color: #333;">
+            <small>Stress</small>
+            <span id="omar-stress" class="value" style="font-size: 1.2em;">--</span>
         </div>
     </div>
 
-    <div class="directive-box" style="background: rgba(212,175,55,0.05); padding: 15px; border: 1px dashed var(--gold);">
+    <div class="directive-zone">
         <small class="gold">DERNIÈRE DIRECTIVE</small>
-        <p id="omar-status-text" style="margin: 5px 0;">Attente du signal Nexus...</p>
+        <p id="omar-status-text" style="margin: 8px 0; font-size: 0.95em;">Écoute du Nexus en cours...</p>
     </div>
 
-    <h3 class="gold" style="margin-top:25px;">O.M.A.R — CONSEIL</h3>
     <div id="chat-history"></div>
-    <div style="display: flex; justify-content: space-between;">
+    <div class="input-group">
         <input type="text" id="user-input" placeholder="Ordre souverain...">
         <button id="send-btn">SEND</button>
     </div>
