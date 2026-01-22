@@ -4,60 +4,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>O.M.A.R — ZENITH MOBILE</title>
+
     <style>
-        :root { --gold: #D4AF37; --black: #050505; --dark-gray: #111; }
-        body { background: var(--black); color: #eee; font-family: 'Consolas', 'Courier New', monospace; margin: 0; padding: 15px; }
-        .hud-card { border: 1px solid var(--gold); background: linear-gradient(145deg, #0a0a0a, #111); padding: 20px; border-radius: 12px; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
-        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-        .gold { color: var(--gold); font-weight: bold; text-transform: uppercase; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 4px; border-left: 2px solid var(--gold); }
-        .value { display: block; font-size: 1.4em; font-weight: bold; margin-top: 5px; color: #fff; }
-        .directive-zone { margin-top: 15px; padding: 15px; background: rgba(212, 175, 55, 0.05); border: 1px dashed var(--gold); }
-        #chat-history { height: 160px; overflow-y: auto; font-size: 0.85em; margin: 15px 0; padding: 10px; background: #000; border: 1px solid #222; }
-        .bot-msg { color: var(--gold); margin-bottom: 8px; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 4px; }
-        .user-msg { color: #aaa; margin-bottom: 8px; text-align: right; }
-        .input-group { display: flex; gap: 8px; }
-        input { flex-grow: 1; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 4px; }
-        button { background: var(--gold); border: none; padding: 10px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        :root {
+            --gold: #D4AF37;
+            --black: #050505;
+            --dark-gray: #111;
+        }
+
+        body {
+            background: var(--black);
+            color: #eee;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .hud-card {
+            border: 1px solid var(--gold);
+            background: linear-gradient(145deg, #0a0a0a, #111);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .gold {
+            color: var(--gold);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 2px solid var(--gold);
+        }
+
+        .value {
+            display: block;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 5px;
+            color: #fff;
+        }
+
+        .directive-zone {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px dashed var(--gold);
+            border-radius: 6px;
+        }
+
+        #chat-history {
+            height: 160px;
+            overflow-y: auto;
+            font-size: 0.85em;
+            margin: 15px 0;
+            padding: 10px;
+            background: #000;
+            border: 1px solid #222;
+            border-radius: 6px;
+        }
+
+        .bot-msg {
+            color: var(--gold);
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(212,175,55,0.1);
+            padding-bottom: 4px;
+        }
+
+        .user-msg {
+            color: #aaa;
+            margin-bottom: 8px;
+            text-align: right;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            flex-grow: 1;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        button {
+            background: var(--gold);
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        button:active {
+            opacity: 0.8;
+        }
     </style>
 </head>
+
 <body>
 
 <div class="hud-card">
+
+    <!-- HEADER -->
     <div class="header">
         <span class="gold" id="omar-decision-badge">SOUVERAIN</span>
-        <small id="omar-last-update" style="color: #555;">SYNC...</small>
+        <small id="omar-last-update" style="color: #777;">SYNC...</small>
     </div>
 
+    <!-- STATS -->
     <div class="stats-grid">
         <div class="stat-box">
             <small>GLOBAL BIAS</small>
             <span id="omar-index" class="value">--</span>
         </div>
+
         <div class="stat-box">
             <small>PATRIMOINE</small>
-            <span class="value gold">ACTIF</span>
+            <span id="omar-wealth" class="value gold">ACTIF</span>
         </div>
     </div>
 
+    <!-- REGIME + VIX -->
     <div class="stat-box" style="margin-bottom: 10px; border-left-color: #444;">
-        <div style="font-size: 0.85em;">Régime : <span id="omar-regime" class="gold">--</span></div>
-        <div style="font-size: 0.85em; margin-top: 5px;">VIX Index : <span id="omar-stress" class="gold">--</span></div>
+        <div style="font-size: 0.85em;">
+            Régime : <span id="omar-regime" class="gold">--</span>
+        </div>
+        <div style="font-size: 0.85em; margin-top: 5px;">
+            VIX Index : <span id="omar-stress" class="gold">--</span>
+        </div>
     </div>
 
+    <!-- CONSEIL -->
     <div class="directive-zone">
         <small class="gold">CONSEIL DES AGENTS</small>
-        <p id="omar-status-text" style="margin: 8px 0; font-size: 0.9em;">Analyse multi-agents en cours...</p>
+        <p id="omar-status-text" style="margin: 8px 0; font-size: 0.9em;">
+            Analyse multi-agents en cours...
+        </p>
     </div>
 
+    <!-- CHAT -->
     <div id="chat-history"></div>
+
     <div class="input-group">
         <input type="text" id="user-input" placeholder="Ordre souverain...">
         <button id="send-btn">SEND</button>
     </div>
+
 </div>
 
 <script type="module" src="app.js"></script>
+
 </body>
 </html>
