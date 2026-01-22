@@ -14,73 +14,109 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// ============================================================
+//  SYNCHRONISATION NEXUS / HUD
+// ============================================================
+
 function startNexusSync() {
-    // 1. Écoute de NEXUS_OUTPUT (Le résultat final pour le HUD)
-    onValue(ref(db, 'nexus/nexus_output/hud'), (snapshot) => {
+
+    // 1. HUD FINAL (nexus_output)
+    onValue(ref(db, "nexus_output/hud"), (snapshot) => {
         const hud = snapshot.val();
-        if (hud) {
-            document.getElementById("omar-index").textContent = hud.global_bias || "NEUTRAL";
-            document.getElementById("omar-decision-badge").textContent = hud.global_bias || "SOUVERAIN";
-        }
+        if (!hud) return;
+
+        document.getElementById("omar-index").textContent =
+            hud.global_bias || "NEUTRAL";
+
+        document.getElementById("omar-decision-badge").textContent =
+            hud.global_bias || "SOUVERAIN";
     });
 
-    // 2. Écoute de l'ORCHESTRATEUR (Régime et VIX)
-    onValue(ref(db, 'nexus/orchestrator'), (snapshot) => {
+    // 2. ORCHESTRATEUR (régime, risque, conseil)
+    onValue(ref(db, "nexus/orchestrator"), (snapshot) => {
         const data = snapshot.val();
-        if (data) {
-            // Régime Macro
-            if (data.cognitive && data.cognitive.regime) {
-                document.getElementById("omar-regime").textContent = data.cognitive.regime;
-            }
-            // VIX / Stress
-            if (data.cognitive && data.cognitive.risk) {
-                document.getElementById("omar-stress").textContent = data.cognitive.risk.vix || "--";
-            }
-            // Dernière Directive (Verdict du Conseil)
-            if (data.cognitive && data.cognitive.council_verdict) {
-                document.getElementById("omar-status-text").textContent = "Verdict : " + data.cognitive.council_verdict.decision;
-            }
+        if (!data || !data.cognitive) return;
+
+        const cog = data.cognitive;
+
+        // Régime macro
+        if (cog.regime) {
+            document.getElementById("omar-regime").textContent = cog.regime;
+        }
+
+        // VIX / Stress
+        if (cog.risk && cog.risk.vix !== undefined) {
+            document.getElementById("omar-stress").textContent = cog.risk.vix;
+        }
+
+        // Verdict du Conseil Souverain
+        if (cog.council_crystal_decision) {
+            const decision = cog.council_crystal_decision.decision || "N/A";
+            document.getElementById("omar-status-text").textContent =
+                "Décision souveraine : " + decision;
         }
     });
 
-    // 3. Heartbeat (Santé du système)
-    onValue(ref(db, 'system_status'), (snapshot) => {
+    // 3. Heartbeat système
+    onValue(ref(db, "system_status"), (snapshot) => {
         const status = snapshot.val();
-        if (status) {
-            const time = new Date(status.last_heartbeat).toLocaleTimeString();
-            document.getElementById("omar-last-update").textContent = "Vivant: " + time;
-        }
+        if (!status || !status.last_heartbeat) return;
+
+        const time = new Date(status.last_heartbeat).toLocaleTimeString();
+        document.getElementById("omar-last-update").textContent =
+            "Vivant : " + time;
     });
 }
 
-// --- GESTION DU CHAT ---
+// ============================================================
+//  CHAT OMAR MOBILE
+// ============================================================
+
 function startChat() {
-    const history = document.getElementById('chat-history');
-    onValue(ref(db, 'events'), (snap) => {
+    const history = document.getElementById("chat-history");
+
+    onValue(ref(db, "events/chat"), (snap) => {
         const data = snap.val();
-        if (!data) return;
+        if (!data) {
+            history.innerHTML = "<div style='color:#555;'>Aucun message...</div>";
+            return;
+        }
+
         history.innerHTML = "";
-        let msgs = [];
-        if (data.messages) Object.values(data.messages).forEach(m => msgs.push({...m, type: 'user'}));
-        if (data.replies) Object.values(data.replies).forEach(r => msgs.push({...r, type: 'bot'}));
-        
-        msgs.sort((a,b) => a.timestamp - b.timestamp).slice(-10).forEach(m => {
-            const div = document.createElement('div');
-            div.className = m.type === 'bot' ? 'bot-msg' : 'user-msg';
-            div.innerHTML = `<strong>${m.sender || 'OMAR'}:</strong> ${m.content}`;
+
+        const msgs = Object.values(data)
+            .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+            .slice(-20);
+
+        msgs.forEach((m) => {
+            const div = document.createElement("div");
+            div.className = m.sender === "OMAR" ? "bot-msg" : "user-msg";
+            div.innerHTML = `<strong>${m.sender}:</strong> ${m.content}`;
             history.appendChild(div);
         });
+
         history.scrollTop = history.scrollHeight;
     });
 
-    document.getElementById('send-btn').onclick = () => {
-        const inp = document.getElementById('user-input');
-        if (inp.value) {
-            push(ref(db, 'events/messages'), { sender: "Monsieur", content: inp.value, timestamp: serverTimestamp() });
-            inp.value = "";
-        }
+    // Envoi message
+    document.getElementById("send-btn").onclick = () => {
+        const inp = document.getElementById("user-input");
+        const text = inp.value.trim();
+        if (!text) return;
+
+        push(ref(db, "events/chat"), {
+            sender: "Monsieur",
+            content: text,
+            timestamp: Date.now()
+        });
+
+        inp.value = "";
     };
 }
+
+// ============================================================
+//  INITIALISATION
+// ============================================================
 
 document.addEventListener("DOMContentLoaded", () => {
     startNexusSync();
