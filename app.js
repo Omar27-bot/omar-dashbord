@@ -14,80 +14,75 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// --- FONCTION DE SYNCHRONISATION DU NEXUS ---
 function startNexusSync() {
-    // 1. Branche Cognitive (Décision et Scénarios)
-    const cogRef = ref(db, 'nexus/orchestrator/cognitive');
-    onValue(cogRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            // Mise à jour de la Décision
-            const decision = data.council_crystal_decision || "ACTIF";
-            document.getElementById("omar-decision-badge").textContent = decision;
-            document.getElementById("omar-status-text").textContent = "CRISTAL : " + decision;
-
-            // Mise à jour via Scénarios (Index et Régime)
-            if (data.scenarios) {
-                const scn = data.scenarios[1] || data.scenarios[0];
-                if (scn) {
-                    document.getElementById("omar-regime").textContent = scn.title || scn.status;
-                    document.getElementById("omar-index").textContent = (scn.score * 100).toFixed(0);
-                }
-            }
-            document.getElementById("omar-last-update").textContent = "SYNCHRONISÉ : " + new Date().toLocaleTimeString();
+    // 1. Écoute de NEXUS_OUTPUT (Le résultat final pour le HUD)
+    onValue(ref(db, 'nexus/nexus_output/hud'), (snapshot) => {
+        const hud = snapshot.val();
+        if (hud) {
+            document.getElementById("omar-index").textContent = hud.global_bias || "NEUTRAL";
+            document.getElementById("omar-decision-badge").textContent = hud.global_bias || "SOUVERAIN";
         }
     });
 
-    // 2. Branche Status Technique (Stress)
+    // 2. Écoute de l'ORCHESTRATEUR (Régime et VIX)
+    onValue(ref(db, 'nexus/orchestrator'), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Régime Macro
+            if (data.cognitive && data.cognitive.regime) {
+                document.getElementById("omar-regime").textContent = data.cognitive.regime;
+            }
+            // VIX / Stress
+            if (data.cognitive && data.cognitive.risk) {
+                document.getElementById("omar-stress").textContent = data.cognitive.risk.vix || "--";
+            }
+            // Dernière Directive (Verdict du Conseil)
+            if (data.cognitive && data.cognitive.council_verdict) {
+                document.getElementById("omar-status-text").textContent = "Verdict : " + data.cognitive.council_verdict.decision;
+            }
+        }
+    });
+
+    // 3. Heartbeat (Santé du système)
     onValue(ref(db, 'system_status'), (snapshot) => {
-        const sys = snapshot.val();
-        if (sys) {
-            document.getElementById("omar-stress").textContent = (sys.stress_level || 0).toFixed(2) + "%";
-            if (sys.omar_index) document.getElementById("omar-index").textContent = sys.omar_index;
+        const status = snapshot.val();
+        if (status) {
+            const time = new Date(status.last_heartbeat).toLocaleTimeString();
+            document.getElementById("omar-last-update").textContent = "Vivant: " + time;
         }
     });
 }
 
-// --- FONCTION DE CHAT (EVENTS) ---
-function startChatSync() {
-    const input = document.getElementById('user-input');
-    const btn = document.getElementById('send-btn');
+// --- GESTION DU CHAT ---
+function startChat() {
     const history = document.getElementById('chat-history');
-
-    // Envoi d'un message
-    btn.onclick = () => {
-        if (!input.value.trim()) return;
-        push(ref(db, 'events/messages'), {
-            sender: "Monsieur",
-            content: input.value,
-            timestamp: serverTimestamp()
-        });
-        input.value = "";
-    };
-
-    // Lecture des messages et réponses
-    onValue(ref(db, 'events'), (snapshot) => {
-        const data = snapshot.val();
+    onValue(ref(db, 'events'), (snap) => {
+        const data = snap.val();
         if (!data) return;
-        
         history.innerHTML = "";
-        let combined = [];
-        if (data.messages) Object.values(data.messages).forEach(m => combined.push({...m, role: 'user'}));
-        if (data.replies) Object.values(data.replies).forEach(r => combined.push({...r, role: 'bot'}));
+        let msgs = [];
+        if (data.messages) Object.values(data.messages).forEach(m => msgs.push({...m, type: 'user'}));
+        if (data.replies) Object.values(data.replies).forEach(r => msgs.push({...r, type: 'bot'}));
         
-        // Tri par temps et affichage des 10 derniers
-        combined.sort((a,b) => a.timestamp - b.timestamp).slice(-10).forEach(msg => {
+        msgs.sort((a,b) => a.timestamp - b.timestamp).slice(-10).forEach(m => {
             const div = document.createElement('div');
-            div.className = msg.role === 'bot' ? 'bot-msg' : 'user-msg';
-            div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
+            div.className = m.type === 'bot' ? 'bot-msg' : 'user-msg';
+            div.innerHTML = `<strong>${m.sender || 'OMAR'}:</strong> ${m.content}`;
             history.appendChild(div);
         });
         history.scrollTop = history.scrollHeight;
     });
+
+    document.getElementById('send-btn').onclick = () => {
+        const inp = document.getElementById('user-input');
+        if (inp.value) {
+            push(ref(db, 'events/messages'), { sender: "Monsieur", content: inp.value, timestamp: serverTimestamp() });
+            inp.value = "";
+        }
+    };
 }
 
-// Initialisation globale
 document.addEventListener("DOMContentLoaded", () => {
     startNexusSync();
-    startChatSync();
+    startChat();
 });
