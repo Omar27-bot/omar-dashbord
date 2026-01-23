@@ -10,6 +10,9 @@
             --gold: #D4AF37;
             --black: #050505;
             --dark-gray: #111;
+            --red: #ff3b3b;
+            --orange: #ff9800;
+            --green: #4caf50;
         }
 
         body {
@@ -26,6 +29,11 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .hud-card.alert {
+            box-shadow: 0 0 25px rgba(255, 59, 59, 0.7);
+            border-color: var(--red);
         }
 
         .header {
@@ -124,12 +132,90 @@
         button:active {
             opacity: 0.8;
         }
+
+        /* Panneaux Scénarios / Agents / Heatmap */
+
+        .panel {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            border: 1px solid #222;
+        }
+
+        .panel-title {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gold);
+            margin-bottom: 6px;
+        }
+
+        .scenario-item,
+        .agent-item {
+            font-size: 0.8em;
+            margin-bottom: 4px;
+        }
+
+        .scenario-item.critical {
+            color: var(--red);
+        }
+
+        .scenario-item.alert {
+            color: var(--orange);
+        }
+
+        .scenario-item.stable {
+            color: var(--green);
+        }
+
+        .agent-item.error {
+            color: var(--red);
+        }
+
+        .agent-item.major {
+            color: var(--orange);
+        }
+
+        .agent-item.minor {
+            color: var(--gold);
+        }
+
+        .heatmap-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .heat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .heat-dot.low {
+            background: var(--green);
+        }
+
+        .heat-dot.medium {
+            background: var(--orange);
+        }
+
+        .heat-dot.high {
+            background: var(--red);
+        }
+
+        .heat-label {
+            font-size: 0.75em;
+            color: #aaa;
+        }
     </style>
 </head>
 
 <body>
 
-<div class="hud-card">
+<div class="hud-card" id="hud-root">
 
     <!-- HEADER -->
     <div class="header">
@@ -166,6 +252,30 @@
         <p id="omar-status-text" style="margin: 8px 0; font-size: 0.9em;">
             Analyse multi-agents en cours...
         </p>
+    </div>
+
+    <!-- SCÉNARIOS -->
+    <div class="panel" id="panel-scenarios">
+        <div class="panel-title">Scénarios</div>
+        <div id="scenarios-list">
+            <div style="font-size:0.8em; color:#777;">Aucun scénario...</div>
+        </div>
+    </div>
+
+    <!-- AGENTS -->
+    <div class="panel" id="panel-agents">
+        <div class="panel-title">Agents institutionnels</div>
+        <div id="agents-list">
+            <div style="font-size:0.8em; color:#777;">Aucun agent...</div>
+        </div>
+    </div>
+
+    <!-- MINI HEATMAP -->
+    <div class="panel" id="panel-heatmap">
+        <div class="panel-title">Risque global</div>
+        <div id="heatmap-content">
+            <div style="font-size:0.8em; color:#777;">En attente de données...</div>
+        </div>
     </div>
 
     <!-- CHAT -->
