@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCc7P7swrV4oXeOxMhFRZScIGmFB-gfkvg",
@@ -15,56 +15,43 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // ============================================================
-//  SYNCHRONISATION NEXUS / HUD
+//  SYNCHRONISATION HUD_CONTRACT
 // ============================================================
 
-function startNexusSync() {
+function startHudSync() {
 
-    // 1. HUD FINAL (nexus_output)
-    onValue(ref(db, "nexus_output/hud"), (snapshot) => {
+    onValue(ref(db, "hud_contract"), (snapshot) => {
         const hud = snapshot.val();
         if (!hud) return;
 
+        // --- GLOBAL BIAS ---
         document.getElementById("omar-index").textContent =
-            hud.global_bias || "NEUTRAL";
+            hud.hud?.global_bias || "NEUTRAL";
 
         document.getElementById("omar-decision-badge").textContent =
-            hud.global_bias || "SOUVERAIN";
-    });
+            hud.hud?.global_bias || "SOUVERAIN";
 
-    // 2. ORCHESTRATEUR (régime, risque, conseil)
-    onValue(ref(db, "nexus/orchestrator"), (snapshot) => {
-        const data = snapshot.val();
-        if (!data || !data.cognitive) return;
+        // --- MACRO REGIME ---
+        document.getElementById("omar-regime").textContent =
+            hud.macro?.regime || "--";
 
-        const cog = data.cognitive;
+        // --- VIX / STRESS ---
+        document.getElementById("omar-stress").textContent =
+            hud.macro?.vix ?? "--";
 
-        // Régime macro
-        if (cog.regime) {
-            document.getElementById("omar-regime").textContent = cog.regime;
+        // --- CONSEIL ---
+        document.getElementById("omar-status-text").textContent =
+            hud.council?.decision
+                ? "Décision souveraine : " + hud.council.decision
+                : "Analyse en cours...";
+
+        // --- SYSTEM STATUS ---
+        const sys = hud.system_status || {};
+        if (sys.last_heartbeat) {
+            const time = new Date(sys.last_heartbeat).toLocaleTimeString();
+            document.getElementById("omar-last-update").textContent =
+                "Vivant : " + time;
         }
-
-        // VIX / Stress
-        if (cog.risk && cog.risk.vix !== undefined) {
-            document.getElementById("omar-stress").textContent = cog.risk.vix;
-        }
-
-        // Verdict du Conseil Souverain
-        if (cog.council_crystal_decision) {
-            const decision = cog.council_crystal_decision.decision || "N/A";
-            document.getElementById("omar-status-text").textContent =
-                "Décision souveraine : " + decision;
-        }
-    });
-
-    // 3. Heartbeat système
-    onValue(ref(db, "system_status"), (snapshot) => {
-        const status = snapshot.val();
-        if (!status || !status.last_heartbeat) return;
-
-        const time = new Date(status.last_heartbeat).toLocaleTimeString();
-        document.getElementById("omar-last-update").textContent =
-            "Vivant : " + time;
     });
 }
 
@@ -75,7 +62,7 @@ function startNexusSync() {
 function startChat() {
     const history = document.getElementById("chat-history");
 
-    onValue(ref(db, "events/chat"), (snap) => {
+    onValue(ref(db, "hud_contract/events/chat"), (snap) => {
         const data = snap.val();
         if (!data) {
             history.innerHTML = "<div style='color:#555;'>Aucun message...</div>";
@@ -104,7 +91,7 @@ function startChat() {
         const text = inp.value.trim();
         if (!text) return;
 
-        push(ref(db, "events/chat"), {
+        push(ref(db, "hud_contract/events/chat"), {
             sender: "Monsieur",
             content: text,
             timestamp: Date.now()
@@ -119,6 +106,6 @@ function startChat() {
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    startNexusSync();
+    startHudSync();
     startChat();
 });
