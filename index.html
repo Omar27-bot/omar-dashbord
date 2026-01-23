@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>O.M.A.R — ZENITH MOBILE</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="omar-logo-512.jpg">
+
+    <!-- STYLE -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -76,7 +82,17 @@
 
 </div>
 
+<!-- APP JS -->
 <script type="module" src="app.js"></script>
+
+<!-- SERVICE WORKER REGISTRATION -->
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./service-workers.js")
+        .then(() => console.log("Service Worker enregistré"))
+        .catch(err => console.error("Erreur SW :", err));
+}
+</script>
 
 </body>
 </html>
