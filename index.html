@@ -72,6 +72,61 @@
         <div id="heatmap-content"></div>
     </div>
 
+    <!-- LLM HUD -->
+    <div class="panel" id="panel-llm">
+        <div class="panel-title">OMAR LLM — Lecture Globale</div>
+        <div class="llm-block">
+            <div class="llm-title">Macro</div>
+            <div class="llm-text" id="llm-macro">En attente...</div>
+        </div>
+        <div class="llm-block">
+            <div class="llm-title">Risque</div>
+            <div class="llm-text" id="llm-risk">En attente...</div>
+        </div>
+        <div class="llm-block">
+            <div class="llm-title">Conseil</div>
+            <div class="llm-text" id="llm-council">En attente...</div>
+        </div>
+        <div class="llm-block">
+            <div class="llm-title">Securite</div>
+            <div class="llm-text" id="llm-security">En attente...</div>
+        </div>
+        <div class="llm-block">
+            <div class="llm-title">Portfolio</div>
+            <div class="llm-text" id="llm-portfolio">En attente...</div>
+        </div>
+        <div class="llm-block">
+            <div class="llm-title">Journal</div>
+            <div class="llm-text" id="llm-journal">En attente...</div>
+        </div>
+        <div class="llm-block">
+            <div class="llm-title">Nexus</div>
+            <div class="llm-text" id="llm-nexus">En attente...</div>
+        </div>
+        <div class="llm-block">
+            <div class="llm-title">Kernel</div>
+            <div class="llm-text" id="llm-kernel">En attente...</div>
+        </div>
+    </div>
+
+    <!-- OPPORTUNITES -->
+    <div class="panel" id="panel-opportunities">
+        <div class="panel-title">Opportunites</div>
+        <div id="opportunities-list"></div>
+    </div>
+
+    <!-- ALERTES / CRISIS -->
+    <div class="panel" id="panel-alerts">
+        <div class="panel-title">Alertes / Crisis</div>
+        <div id="alerts-list"></div>
+    </div>
+
+    <!-- RAPPORTS QUOTIDIENS -->
+    <div class="panel" id="panel-reports">
+        <div class="panel-title">Rapports Quotidiens</div>
+        <div id="reports-list"></div>
+    </div>
+
     <!-- CHAT -->
     <div id="chat-history"></div>
 
@@ -88,7 +143,7 @@
 <!-- SERVICE WORKER REGISTRATION -->
 <script>
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-workers.js")
+    navigator.serviceWorker.register("./service-worker.js")
         .then(() => console.log("Service Worker enregistré"))
         .catch(err => console.error("Erreur SW :", err));
 }
