@@ -68,6 +68,35 @@ function startHudSync() {
 }
 
 // ============================================================
+//  SYNCHRONISATION HUD LLM (TEXTE GLOBAL)
+// ============================================================
+
+function startHudLlmSync() {
+    onValue(ref(db, "hud_llm"), (snapshot) => {
+        const node = snapshot.val();
+        if (!node) return;
+
+        const payload = node.payload || node.value?.payload || node.value || node;
+
+        setLlmText("llm-macro", payload.macro_text);
+        setLlmText("llm-risk", payload.risk_text);
+        setLlmText("llm-council", payload.council_text);
+        setLlmText("llm-security", payload.security_text);
+        setLlmText("llm-portfolio", payload.portfolio_text);
+        setLlmText("llm-journal", payload.journal_text);
+        setLlmText("llm-nexus", payload.nexus_text);
+        setLlmText("llm-kernel", payload.kernel_text);
+    });
+}
+
+function setLlmText(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const txt = value ? String(value) : "En attente...";
+    el.textContent = txt;
+}
+
+// ============================================================
 //  RENDER SCÉNARIOS
 // ============================================================
 
@@ -203,7 +232,7 @@ function applyAlertMode(hud) {
 function startChat() {
     const history = document.getElementById("chat-history");
 
-    onValue(ref(db, "hud_contract/events/chat"), (snap) => {
+    onValue(ref(db, "omar_chat/messages"), (snap) => {
         const data = snap.val();
         if (!data) {
             history.innerHTML = "<div style='color:#555;'>Aucun message...</div>";
@@ -213,13 +242,15 @@ function startChat() {
         history.innerHTML = "";
 
         const msgs = Object.values(data)
-            .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
-            .slice(-20);
+            .sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0))
+            .slice(-50);
 
         msgs.forEach((m) => {
             const div = document.createElement("div");
-            div.className = m.sender === "OMAR" ? "bot-msg" : "user-msg";
-            div.innerHTML = `<strong>${m.sender}:</strong> ${m.content}`;
+            const author = m.author || m.sender || "OMAR";
+            const content = m.message || m.content || "";
+            div.className = author === "OMAR" ? "bot-msg" : "user-msg";
+            div.innerHTML = `<strong>${author}:</strong> ${content}`;
             history.appendChild(div);
         });
 
@@ -231,14 +262,119 @@ function startChat() {
         const text = inp.value.trim();
         if (!text) return;
 
-        push(ref(db, "hud_contract/events/chat"), {
-            sender: "Monsieur",
-            content: text,
-            timestamp: Date.now()
+        push(ref(db, "omar_chat/messages"), {
+            author: "user",
+            message: text,
+            level: "INFO",
+            timestamp: new Date().toISOString()
         });
 
         inp.value = "";
     };
+}
+
+// ============================================================
+//  OPPORTUNITES / ALERTES / RAPPORTS
+// ============================================================
+
+function startOpportunitiesSync() {
+    onValue(ref(db, "opportunities"), (snap) => {
+        const data = snap.val();
+        renderSimpleList("opportunities-list", data, "Aucune opportunite...");
+    });
+}
+
+function startAlertsSync() {
+    onValue(ref(db, "alerts"), (snap) => {
+        const data = snap.val();
+        renderSimpleList("alerts-list", data, "Aucune alerte...");
+    });
+    onValue(ref(db, "crisis"), (snap) => {
+        const data = snap.val();
+        if (data) {
+            renderSimpleList("alerts-list", data, "Aucune alerte...");
+        }
+    });
+}
+
+function startReportsSync() {
+    onValue(ref(db, "daily_reports"), (snap) => {
+        const data = snap.val();
+        renderReports("reports-list", data, "Aucun rapport...");
+    });
+}
+
+function renderSimpleList(containerId, data, emptyText) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (!data || typeof data !== "object") {
+        container.innerHTML = `<div style='font-size:0.8em; color:#777;'>${emptyText}</div>`;
+        return;
+    }
+
+    const items = Object.values(data);
+    if (items.length === 0) {
+        container.innerHTML = `<div style='font-size:0.8em; color:#777;'>${emptyText}</div>`;
+        return;
+    }
+
+    items.slice(-20).forEach((item) => {
+        const div = document.createElement("div");
+        div.classList.add(
+            containerId.includes("alert") ? "alert-item" :
+            containerId.includes("report") ? "report-item" :
+            "opportunity-item"
+        );
+        if (typeof item === "string") {
+            div.textContent = item;
+        } else {
+            const title = item.title || item.subject || item.type || "OMAR";
+            const msg = item.message || item.summary || item.details || JSON.stringify(item);
+            div.textContent = `${title} — ${msg}`;
+        }
+        container.appendChild(div);
+    });
+}
+
+function renderReports(containerId, data, emptyText) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (!data || typeof data !== "object") {
+        container.innerHTML = `<div style='font-size:0.8em; color:#777;'>${emptyText}</div>`;
+        return;
+    }
+
+    const items = Object.values(data);
+    if (items.length === 0) {
+        container.innerHTML = `<div style='font-size:0.8em; color:#777;'>${emptyText}</div>`;
+        return;
+    }
+
+    items.slice(-10).reverse().forEach((item) => {
+        const div = document.createElement("div");
+        div.classList.add("report-item");
+        const title = item.title || "Rapport OMAR";
+        const summary = item.summary || "";
+        const highlights = Array.isArray(item.highlights) ? item.highlights.filter(Boolean) : [];
+
+        let html = `<strong>${title}</strong><br>`;
+        if (summary) {
+            html += `<div class="report-summary">${summary}</div>`;
+        }
+        if (highlights.length > 0) {
+            html += `<ul class="report-highlights">`;
+            highlights.forEach((h) => {
+                html += `<li>${h}</li>`;
+            });
+            html += `</ul>`;
+        }
+        div.innerHTML = html;
+        container.appendChild(div);
+    });
 }
 
 // ============================================================
@@ -247,5 +383,9 @@ function startChat() {
 
 document.addEventListener("DOMContentLoaded", () => {
     startHudSync();
+    startHudLlmSync();
+    startOpportunitiesSync();
+    startAlertsSync();
+    startReportsSync();
     startChat();
 });
