@@ -3,47 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>O.M.A.R ? ZENITH MOBILE</title>
-
-    <!-- PWA -->
+    <title>O.M.A.R. ZENITH MOBILE</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="omar-logo-512.jpg">
-
-    <!-- STYLE -->
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="hud-card" id="hud-root">
-
-    <!-- CHAT ONLY -->
+    
     <div class="header">
-        <span class="gold">OMAR CHAT</span>
-        <small id="omar-last-update" style="color: #777;">SYNC...</small>
+        <div class="status-left">
+            <span class="gold">OMAR_OS</span>
+            <div id="omar-decision-badge" class="badge">SOUVERAIN</div>
+        </div>
+        <small id="omar-last-update">SYNC...</small>
     </div>
 
-    <!-- CHAT -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <small>BIAS</small>
+            <span id="omar-index" class="value">--</span>
+        </div>
+        <div class="stat-box">
+            <small>RÉGIME</small>
+            <span id="omar-regime" class="value">--</span>
+        </div>
+    </div>
+
+    <div class="monitoring-container">
+        <div class="panel">
+            <div class="panel-title">World Risk Heatmap</div>
+            <div id="heatmap-content"></div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">Scénarios Crystal</div>
+            <div id="scenarios-list"></div>
+        </div>
+    </div>
+
     <div id="chat-history"></div>
 
     <div class="input-group">
-        <input type="text" id="user-input" placeholder="Ordre souverain...">
+        <input type="text" id="user-input" placeholder="Ordre souverain..." autocomplete="off">
         <button id="send-btn">SEND</button>
     </div>
 
 </div>
 
-<!-- APP JS -->
 <script type="module" src="app.js"></script>
-
-<!-- SERVICE WORKER REGISTRATION -->
-<script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js")
-        .then(() => console.log("Service Worker enregistr?"))
-        .catch(err => console.error("Erreur SW :", err));
-}
-</script>
 
 </body>
 </html>
