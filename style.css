@@ -1,71 +1,72 @@
 :root {
-    --gold: #D4AF37;
-    --black: #050505;
-    --red: #ff3b3b;
-    --green: #4caf50;
-    --safe-bottom: env(safe-area-inset-bottom);
+    --gold: #d4af37;
+    --dark: #0a0a0a;
+    --glass: rgba(255, 255, 255, 0.05);
 }
 
 body {
-    background: var(--black);
-    color: #eee;
-    font-family: 'Consolas', monospace;
+    background: var(--dark);
+    color: white;
+    font-family: 'Courier New', monospace;
     margin: 0;
-    padding: 10px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-}
-
-.hud-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--gold);
-    background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
-    padding: 15px;
-    border-radius: 12px;
     overflow: hidden;
 }
 
-/* ÉTAT D'ALERTE */
-.hud-card.alert { border-color: var(--red); box-shadow: 0 0 20px rgba(255, 59, 59, 0.3); }
-
-.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.badge { background: var(--gold); color: black; font-size: 0.7em; padding: 2px 6px; border-radius: 3px; margin-top: 4px; font-weight: bold; }
-
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.stat-box { background: rgba(255,255,255,0.03); padding: 8px; border-left: 2px solid var(--gold); border-radius: 4px; }
-.stat-box small { font-size: 0.6em; color: var(--gold); text-transform: uppercase; }
-.value { display: block; font-size: 1.1em; font-weight: bold; }
-
-.panel { background: rgba(255,255,255,0.02); padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #222; }
-.panel-title { font-size: 0.65em; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; opacity: 0.8; }
-
-/* CHAT AREA - FLEX AUTO-ADAPTATIF */
-#chat-history {
-    flex: 1;
-    overflow-y: auto;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid #1a1a1a;
-    border-radius: 6px;
-    padding: 10px;
-    margin-bottom: 12px;
-    -webkit-overflow-scrolling: touch;
+#hud-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
-.bot-msg, .user-msg { font-size: 0.85em; margin-bottom: 10px; line-height: 1.4; }
-.bot-msg { color: var(--gold); border-left: 2px solid var(--gold); padding-left: 8px; }
-.user-msg { text-align: right; color: #aaa; border-right: 2px solid #444; padding-right: 8px; }
+header {
+    padding: 15px;
+    background: linear-gradient(to bottom, #1a1a1a, transparent);
+    border-bottom: 1px solid var(--gold);
+}
 
-/* INPUT GROUP FIXÉ EN BAS */
-.input-group { display: flex; gap: 8px; margin-bottom: var(--safe-bottom); }
-input { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; font-size: 16px; }
-button { background: var(--gold); border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; font-size: 0.9em; }
+.probability-engine {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
 
-/* HEATMAP DOTS */
-.heatmap-row { display: flex; gap: 4px; flex-wrap: wrap; }
-.heat-dot { width: 8px; height: 8px; border-radius: 2px; }
-.heat-dot.high { background: var(--red); }
-.heat-dot.low { background: var(--green); }
+.edge-card {
+    background: var(--glass);
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.bar-bg { background: #222; height: 4px; margin: 5px 0; }
+.bar { height: 100%; transition: width 0.5s ease-in-out; }
+.green { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+.red { background: #ff4444; box-shadow: 0 0 10px #ff4444; }
+
+#chat-flow {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+footer {
+    display: flex;
+    padding: 15px;
+    background: var(--glass);
+}
+
+#user-input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: white;
+    padding: 10px;
+}
+
+#send-btn {
+    background: var(--gold);
+    border: none;
+    padding: 10px 20px;
+    margin-left: 5px;
+    font-weight: bold;
+}
