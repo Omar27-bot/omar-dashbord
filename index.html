@@ -2,43 +2,99 @@
 <html lang="fr-CA">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="OMAR_OS - Tableau de bord souverain">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="OMAR_OS - HUD mobile souverain">
+    <meta name="theme-color" content="#0a1218">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <title>OMAR_OS SOUVERAIN</title>
+    <title>OMAR Mobile HUD</title>
 </head>
 <body>
-    <div id="hud-container">
-        <header>
-            <div class="status-bar">
-                <span class="brand">OMAR_OS</span>
-                <span class="sync-status">SYNC: ONLINE</span>
+    <div id="hud-root" class="hud-shell">
+        <header class="hud-header">
+            <div class="brand-row">
+                <div>
+                    <p class="kicker">NEXUS MOBILE</p>
+                    <h1 class="brand">O.M.A.R</h1>
+                </div>
+                <span id="sync-status" class="sync-pill">SYNC: ...</span>
             </div>
             <div class="probability-engine">
-                <div class="edge-card">
+                <article class="edge-card">
                     <span class="label">BUY EDGE</span>
-                    <div class="bar-bg"><div id="buy-bar" class="bar green" style="width: 0%"></div></div>
+                    <div class="bar-bg"><div id="buy-bar" class="bar green" style="width:0%"></div></div>
                     <span id="buy-value" class="percent">0%</span>
-                </div>
-                <div class="edge-card">
+                </article>
+                <article class="edge-card">
                     <span class="label">SHORT EDGE</span>
-                    <div class="bar-bg"><div id="short-bar" class="bar red" style="width: 0%"></div></div>
+                    <div class="bar-bg"><div id="short-bar" class="bar red" style="width:0%"></div></div>
                     <span id="short-value" class="percent">0%</span>
-                </div>
+                </article>
+            </div>
+            <div class="quick-line">
+                <span id="omar-decision-badge" class="badge">SOUVERAIN</span>
+                <span id="omar-regime" class="pill">--</span>
+                <span id="omar-stress" class="pill">VIX --</span>
+                <span id="omar-index" class="pill">NEUTRAL</span>
             </div>
         </header>
 
-        <main id="chat-flow">
-            <div id="chat-history"></div>
-        </main>
+        <section class="system-strip">
+            <p id="omar-status-text">Analyse en cours...</p>
+            <p id="omar-last-update">Vivant : --</p>
+        </section>
 
-        <footer>
-            <input type="text" id="user-input" placeholder="Ordre souverain...">
-            <button id="send-btn">SEND</button>
-        </footer>
+        <main class="hud-main">
+            <section class="panel panel-chat">
+                <h2>Chat</h2>
+                <div id="chat-history" class="chat-history"></div>
+                <footer class="chat-input">
+                    <input type="text" id="user-input" placeholder="Ordre souverain...">
+                    <button id="send-btn" type="button">Envoyer</button>
+                </footer>
+            </section>
+
+            <section class="panel panel-intel">
+                <h2>Intelligence</h2>
+                <details open>
+                    <summary>Scénarios</summary>
+                    <div id="scenarios-list"></div>
+                </details>
+                <details open>
+                    <summary>Agents</summary>
+                    <div id="agents-list"></div>
+                </details>
+                <details open>
+                    <summary>Heatmap Risque</summary>
+                    <div id="heatmap-content"></div>
+                </details>
+                <details>
+                    <summary>Opportunités</summary>
+                    <div id="opportunities-list"></div>
+                </details>
+                <details>
+                    <summary>Alertes</summary>
+                    <div id="alerts-list"></div>
+                </details>
+                <details>
+                    <summary>Rapports</summary>
+                    <div id="reports-list"></div>
+                </details>
+            </section>
+
+            <section class="panel panel-llm">
+                <h2>LLM Synthèse</h2>
+                <details open><summary>Macro</summary><p id="llm-macro">En attente...</p></details>
+                <details><summary>Risk</summary><p id="llm-risk">En attente...</p></details>
+                <details><summary>Council</summary><p id="llm-council">En attente...</p></details>
+                <details><summary>Security</summary><p id="llm-security">En attente...</p></details>
+                <details><summary>Portfolio</summary><p id="llm-portfolio">En attente...</p></details>
+                <details><summary>Journal</summary><p id="llm-journal">En attente...</p></details>
+                <details><summary>Nexus</summary><p id="llm-nexus">En attente...</p></details>
+                <details><summary>Kernel</summary><p id="llm-kernel">En attente...</p></details>
+            </section>
+        </main>
     </div>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
