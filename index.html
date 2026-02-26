@@ -1,57 +1,40 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr-CA">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>O.M.A.R. ZENITH MOBILE</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="omar-logo-512.jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <title>OMAR_OS SOUVERAIN</title>
 </head>
 <body>
+    <div id="hud-container">
+        <header>
+            <div class="status-bar">
+                <span class="brand">OMAR_OS</span>
+                <span class="sync-status">SYNC: ONLINE</span>
+            </div>
+            <div class="probability-engine">
+                <div class="edge-card">
+                    <span class="label">BUY EDGE</span>
+                    <div class="bar-bg"><div id="buy-bar" class="bar green" style="width: 0%"></div></div>
+                    <span id="buy-value" class="percent">0%</span>
+                </div>
+                <div class="edge-card">
+                    <span class="label">SHORT EDGE</span>
+                    <div class="bar-bg"><div id="short-bar" class="bar red" style="width: 0%"></div></div>
+                    <span id="short-value" class="percent">0%</span>
+                </div>
+            </div>
+        </header>
 
-<div class="hud-card" id="hud-root">
-    
-    <div class="header">
-        <div class="status-left">
-            <span class="gold">OMAR_OS</span>
-            <div id="omar-decision-badge" class="badge">SOUVERAIN</div>
-        </div>
-        <small id="omar-last-update">SYNC...</small>
+        <main id="chat-flow"></main>
+
+        <footer>
+            <input type="text" id="user-input" placeholder="Ordre souverain...">
+            <button id="send-btn">SEND</button>
+        </footer>
     </div>
-
-    <div class="stats-grid">
-        <div class="stat-box">
-            <small>BIAS</small>
-            <span id="omar-index" class="value">--</span>
-        </div>
-        <div class="stat-box">
-            <small>RÉGIME</small>
-            <span id="omar-regime" class="value">--</span>
-        </div>
-    </div>
-
-    <div class="monitoring-container">
-        <div class="panel">
-            <div class="panel-title">World Risk Heatmap</div>
-            <div id="heatmap-content"></div>
-        </div>
-        <div class="panel">
-            <div class="panel-title">Scénarios Crystal</div>
-            <div id="scenarios-list"></div>
-        </div>
-    </div>
-
-    <div id="chat-history"></div>
-
-    <div class="input-group">
-        <input type="text" id="user-input" placeholder="Ordre souverain..." autocomplete="off">
-        <button id="send-btn">SEND</button>
-    </div>
-
-</div>
-
-<script type="module" src="app.js"></script>
-
+    <script src="app.js"></script>
 </body>
 </html>
