@@ -2,8 +2,8 @@
   "name": "O.M.A.R ZENITH SOUVERAIN",
   "short_name": "OMAR",
   "description": "Interface mobile du Nexus Intelligence V10 - Surveillance des actifs",
-  "start_url": "./index.html",
-  "scope": ".",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#050505",
@@ -12,10 +12,10 @@
   "lang": "fr-CA",
   "icons": [
     {
-      "src": "omar-logo-512.jpeg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "src": "omar-logo-512.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }
