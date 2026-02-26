@@ -19,52 +19,64 @@ const db = getDatabase(app);
 // ============================================================
 
 function startHudSync() {
+    onValue(
+        ref(db, "hud_contract"),
+        (snapshot) => {
+            try {
+                const hud = snapshot.val();
+                if (!hud) return;
 
-    onValue(ref(db, "hud_contract"), (snapshot) => {
-        const hud = snapshot.val();
-        if (!hud) return;
+                const root = document.getElementById("hud-root");
+                if (!root) {
+                    console.warn("Element hud-root non trouvé");
+                    return;
+                }
 
-        const root = document.getElementById("hud-root");
+                // --- GLOBAL BIAS ---
+                const bias = hud.hud?.global_bias || "NEUTRAL";
+                setSafeText("omar-index", bias);
+                setSafeText("omar-decision-badge", bias || "SOUVERAIN");
 
-        // --- GLOBAL BIAS ---
-        const bias = hud.hud?.global_bias || "NEUTRAL";
-        document.getElementById("omar-index").textContent = bias;
-        document.getElementById("omar-decision-badge").textContent = bias || "SOUVERAIN";
+                // --- MACRO REGIME ---
+                setSafeText("omar-regime", hud.macro?.regime || "--");
 
-        // --- MACRO REGIME ---
-        document.getElementById("omar-regime").textContent =
-            hud.macro?.regime || "--";
+                // --- VIX / STRESS ---
+                setSafeText("omar-stress", hud.macro?.vix ?? "--");
 
-        // --- VIX / STRESS ---
-        document.getElementById("omar-stress").textContent =
-            hud.macro?.vix ?? "--";
+                // --- CONSEIL ---
+                setSafeText(
+                    "omar-status-text",
+                    hud.council?.decision
+                        ? "Décision souveraine : " + hud.council.decision
+                        : "Analyse en cours..."
+                );
 
-        // --- CONSEIL ---
-        document.getElementById("omar-status-text").textContent =
-            hud.council?.decision
-                ? "Décision souveraine : " + hud.council.decision
-                : "Analyse en cours...";
+                // --- SYSTEM STATUS ---
+                const sys = hud.system_status || {};
+                if (sys.last_heartbeat) {
+                    const time = new Date(sys.last_heartbeat).toLocaleTimeString();
+                    setSafeText("omar-last-update", "Vivant : " + time);
+                }
 
-        // --- SYSTEM STATUS ---
-        const sys = hud.system_status || {};
-        if (sys.last_heartbeat) {
-            const time = new Date(sys.last_heartbeat).toLocaleTimeString();
-            document.getElementById("omar-last-update").textContent =
-                "Vivant : " + time;
+                // --- SCÉNARIOS ---
+                renderScenarios(hud.scenarios || [], root);
+
+                // --- AGENTS ---
+                renderAgents(hud.agents || {});
+
+                // --- HEATMAP ---
+                renderHeatmap(hud.world_risk || {});
+
+                // --- MODE ALERTE ROUGE ---
+                applyAlertMode(hud);
+            } catch (error) {
+                console.error("Erreur dans startHudSync:", error);
+            }
+        },
+        (error) => {
+            console.error("Erreur Firebase (hud_contract):", error);
         }
-
-        // --- SCÉNARIOS ---
-        renderScenarios(hud.scenarios || [], root);
-
-        // --- AGENTS ---
-        renderAgents(hud.agents || {});
-
-        // --- HEATMAP ---
-        renderHeatmap(hud.world_risk || {});
-
-        // --- MODE ALERTE ROUGE ---
-        applyAlertMode(hud);
-    });
+    );
 }
 
 // ============================================================
@@ -72,26 +84,52 @@ function startHudSync() {
 // ============================================================
 
 function startHudLlmSync() {
-    onValue(ref(db, "hud_llm"), (snapshot) => {
-        const node = snapshot.val();
-        if (!node) return;
+    onValue(
+        ref(db, "hud_llm"),
+        (snapshot) => {
+            try {
+                const node = snapshot.val();
+                if (!node) return;
 
-        const payload = node.payload || node.value?.payload || node.value || node;
+                const payload = node.payload || node.value?.payload || node.value || node;
 
-        setLlmText("llm-macro", payload.macro_text);
-        setLlmText("llm-risk", payload.risk_text);
-        setLlmText("llm-council", payload.council_text);
-        setLlmText("llm-security", payload.security_text);
-        setLlmText("llm-portfolio", payload.portfolio_text);
-        setLlmText("llm-journal", payload.journal_text);
-        setLlmText("llm-nexus", payload.nexus_text);
-        setLlmText("llm-kernel", payload.kernel_text);
-    });
+                setLlmText("llm-macro", payload.macro_text);
+                setLlmText("llm-risk", payload.risk_text);
+                setLlmText("llm-council", payload.council_text);
+                setLlmText("llm-security", payload.security_text);
+                setLlmText("llm-portfolio", payload.portfolio_text);
+                setLlmText("llm-journal", payload.journal_text);
+                setLlmText("llm-nexus", payload.nexus_text);
+                setLlmText("llm-kernel", payload.kernel_text);
+            } catch (error) {
+                console.error("Erreur dans startHudLlmSync:", error);
+            }
+        },
+        (error) => {
+            console.error("Erreur Firebase (hud_llm):", error);
+        }
+    );
+}
+
+// ============================================================
+//  HELPER FUNCTIONS - Gestion sécurisée des éléments DOM
+// ============================================================
+
+function setSafeText(id, value) {
+    const el = document.getElementById(id);
+    if (!el) {
+        console.warn(`Élément #${id} non trouvé`);
+        return;
+    }
+    el.textContent = String(value);
 }
 
 function setLlmText(id, value) {
     const el = document.getElementById(id);
-    if (!el) return;
+    if (!el) {
+        console.warn(`Élément #${id} non trouvé`);
+        return;
+    }
     const txt = value ? String(value) : "En attente...";
     el.textContent = txt;
 }
@@ -102,6 +140,10 @@ function setLlmText(id, value) {
 
 function renderScenarios(scenarios, root) {
     const container = document.getElementById("scenarios-list");
+    if (!container) {
+        console.warn("Élément scenarios-list non trouvé");
+        return;
+    }
     container.innerHTML = "";
 
     if (!Array.isArray(scenarios) || scenarios.length === 0) {
@@ -133,6 +175,10 @@ function renderScenarios(scenarios, root) {
 
 function renderAgents(agents) {
     const container = document.getElementById("agents-list");
+    if (!container) {
+        console.warn("Élément agents-list non trouvé");
+        return;
+    }
     container.innerHTML = "";
 
     if (!agents || typeof agents !== "object" || Object.keys(agents).length === 0) {
@@ -165,6 +211,10 @@ function renderAgents(agents) {
 
 function renderHeatmap(worldRisk) {
     const container = document.getElementById("heatmap-content");
+    if (!container) {
+        console.warn("Élément heatmap-content non trouvé");
+        return;
+    }
     container.innerHTML = "";
 
     if (!worldRisk || typeof worldRisk !== "object" || Object.keys(worldRisk).length === 0) {
@@ -202,6 +252,10 @@ function renderHeatmap(worldRisk) {
 
 function applyAlertMode(hud) {
     const root = document.getElementById("hud-root");
+    if (!root) {
+        console.warn("Élément hud-root non trouvé pour appliquer alerte");
+        return;
+    }
     root.classList.remove("alert");
 
     let critical = false;
@@ -220,8 +274,7 @@ function applyAlertMode(hud) {
 
     if (critical) {
         root.classList.add("alert");
-        document.getElementById("omar-status-text").textContent =
-            "ALERTE ROUGE — Surveillance renforcée.";
+        setSafeText("omar-status-text", "ALERTE ROUGE — Surveillance renforcée.");
     }
 }
 
@@ -231,45 +284,81 @@ function applyAlertMode(hud) {
 
 function startChat() {
     const history = document.getElementById("chat-history");
+    const sendBtn = document.getElementById("send-btn");
+    const userInput = document.getElementById("user-input");
 
-    onValue(ref(db, "omar_chat/messages"), (snap) => {
-        const data = snap.val();
-        if (!data) {
-            history.innerHTML = "<div style='color:#555;'>Aucun message...</div>";
-            return;
+    if (!history) {
+        console.warn("Élément chat-history non trouvé");
+        return;
+    }
+
+    if (!sendBtn || !userInput) {
+        console.warn("Éléments send-btn ou user-input non trouvés");
+        return;
+    }
+
+    onValue(
+        ref(db, "omar_chat/messages"),
+        (snap) => {
+            try {
+                const data = snap.val();
+                if (!data) {
+                    history.innerHTML = "<div style='color:#555;'>Aucun message...</div>";
+                    return;
+                }
+
+                history.innerHTML = "";
+
+                const msgs = Object.values(data)
+                    .sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0))
+                    .slice(-50);
+
+                msgs.forEach((m) => {
+                    const div = document.createElement("div");
+                    const author = m.author || m.sender || "OMAR";
+                    const content = m.message || m.content || "";
+                    div.className = author === "OMAR" ? "bot-msg" : "user-msg";
+                    
+                    // Sécurisé : utiliser textContent au lieu de innerHTML
+                    const strong = document.createElement("strong");
+                    strong.textContent = author + ":";
+                    div.appendChild(strong);
+                    
+                    const messageText = document.createElement("span");
+                    messageText.textContent = " " + content;
+                    div.appendChild(messageText);
+                    
+                    history.appendChild(div);
+                });
+
+                history.scrollTop = history.scrollHeight;
+            } catch (error) {
+                console.error("Erreur dans startChat (affichage):", error);
+            }
+        },
+        (error) => {
+            console.error("Erreur Firebase (omar_chat/messages):", error);
         }
+    );
 
-        history.innerHTML = "";
+    sendBtn.onclick = () => {
+        try {
+            const text = userInput.value.trim();
+            if (!text) return;
 
-        const msgs = Object.values(data)
-            .sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0))
-            .slice(-50);
+            push(ref(db, "omar_chat/messages"), {
+                author: "user",
+                message: text,
+                level: "INFO",
+                timestamp: new Date().toISOString()
+            }).catch((error) => {
+                console.error("Erreur lors de l'envoi du message:", error);
+            });
 
-        msgs.forEach((m) => {
-            const div = document.createElement("div");
-            const author = m.author || m.sender || "OMAR";
-            const content = m.message || m.content || "";
-            div.className = author === "OMAR" ? "bot-msg" : "user-msg";
-            div.innerHTML = `<strong>${author}:</strong> ${content}`;
-            history.appendChild(div);
-        });
-
-        history.scrollTop = history.scrollHeight;
-    });
-
-    document.getElementById("send-btn").onclick = () => {
-        const inp = document.getElementById("user-input");
-        const text = inp.value.trim();
-        if (!text) return;
-
-        push(ref(db, "omar_chat/messages"), {
-            author: "user",
-            message: text,
-            level: "INFO",
-            timestamp: new Date().toISOString()
-        });
-
-        inp.value = "";
+            userInput.value = "";
+        } catch (error) {
+            console.error("Erreur dans sendBtn.onclick:", error);
+        }
     };
 }
 
@@ -278,35 +367,79 @@ function startChat() {
 // ============================================================
 
 function startOpportunitiesSync() {
-    onValue(ref(db, "opportunities"), (snap) => {
-        const data = snap.val();
-        renderSimpleList("opportunities-list", data, "Aucune opportunite...");
-    });
+    onValue(
+        ref(db, "opportunities"),
+        (snap) => {
+            try {
+                const data = snap.val();
+                renderSimpleList("opportunities-list", data, "Aucune opportunité...");
+            } catch (error) {
+                console.error("Erreur dans startOpportunitiesSync:", error);
+            }
+        },
+        (error) => {
+            console.error("Erreur Firebase (opportunities):", error);
+        }
+    );
 }
 
 function startAlertsSync() {
-    onValue(ref(db, "alerts"), (snap) => {
-        const data = snap.val();
-        renderSimpleList("alerts-list", data, "Aucune alerte...");
-    });
-    onValue(ref(db, "crisis"), (snap) => {
-        const data = snap.val();
-        if (data) {
-            renderSimpleList("alerts-list", data, "Aucune alerte...");
+    onValue(
+        ref(db, "alerts"),
+        (snap) => {
+            try {
+                const data = snap.val();
+                renderSimpleList("alerts-list", data, "Aucune alerte...");
+            } catch (error) {
+                console.error("Erreur dans startAlertsSync (alerts):", error);
+            }
+        },
+        (error) => {
+            console.error("Erreur Firebase (alerts):", error);
         }
-    });
+    );
+
+    onValue(
+        ref(db, "crisis"),
+        (snap) => {
+            try {
+                const data = snap.val();
+                if (data) {
+                    renderSimpleList("alerts-list", data, "Aucune alerte...");
+                }
+            } catch (error) {
+                console.error("Erreur dans startAlertsSync (crisis):", error);
+            }
+        },
+        (error) => {
+            console.error("Erreur Firebase (crisis):", error);
+        }
+    );
 }
 
 function startReportsSync() {
-    onValue(ref(db, "daily_reports"), (snap) => {
-        const data = snap.val();
-        renderReports("reports-list", data, "Aucun rapport...");
-    });
+    onValue(
+        ref(db, "daily_reports"),
+        (snap) => {
+            try {
+                const data = snap.val();
+                renderReports("reports-list", data, "Aucun rapport...");
+            } catch (error) {
+                console.error("Erreur dans startReportsSync:", error);
+            }
+        },
+        (error) => {
+            console.error("Erreur Firebase (daily_reports):", error);
+        }
+    );
 }
 
 function renderSimpleList(containerId, data, emptyText) {
     const container = document.getElementById(containerId);
-    if (!container) return;
+    if (!container) {
+        console.warn(`Élément ${containerId} non trouvé`);
+        return;
+    }
     container.innerHTML = "";
 
     if (!data || typeof data !== "object") {
@@ -340,7 +473,10 @@ function renderSimpleList(containerId, data, emptyText) {
 
 function renderReports(containerId, data, emptyText) {
     const container = document.getElementById(containerId);
-    if (!container) return;
+    if (!container) {
+        console.warn(`Élément ${containerId} non trouvé`);
+        return;
+    }
     container.innerHTML = "";
 
     if (!data || typeof data !== "object") {
@@ -382,10 +518,16 @@ function renderReports(containerId, data, emptyText) {
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    startHudSync();
-    startHudLlmSync();
-    startOpportunitiesSync();
-    startAlertsSync();
-    startReportsSync();
-    startChat();
+    console.log("Initialisation de l'application OMAR...");
+    try {
+        startHudSync();
+        startHudLlmSync();
+        startOpportunitiesSync();
+        startAlertsSync();
+        startReportsSync();
+        startChat();
+        console.log("Application OMAR initialisée avec succès");
+    } catch (error) {
+        console.error("Erreur lors de l'initialisation:", error);
+    }
 });
