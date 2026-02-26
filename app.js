@@ -14,6 +14,84 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+function asNumber(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+}
+
+function clampPercent(value) {
+    const n = asNumber(value);
+    if (n === null) return 0;
+    const pct = n <= 1 ? n * 100 : n;
+    return Math.max(0, Math.min(100, pct));
+}
+
+function pickNumeric(root, paths) {
+    for (const path of paths) {
+        let node = root;
+        let ok = true;
+        for (const k of path) {
+            if (node && typeof node === "object" && k in node) {
+                node = node[k];
+            } else {
+                ok = false;
+                break;
+            }
+        }
+        if (!ok) continue;
+        const n = asNumber(node);
+        if (n !== null) return n;
+    }
+    return null;
+}
+
+function renderEdgeBars(hud) {
+    const buyRaw = pickNumeric(hud, [
+        ["hud", "buy_edge"],
+        ["hud", "buy_probability"],
+        ["edge", "buy"],
+        ["buy_edge"],
+    ]);
+    const shortRaw = pickNumeric(hud, [
+        ["hud", "short_edge"],
+        ["hud", "sell_probability"],
+        ["edge", "short"],
+        ["short_edge"],
+    ]);
+
+    const buy = clampPercent(buyRaw ?? 0);
+    const short = clampPercent(shortRaw ?? 0);
+
+    const buyBar = document.getElementById("buy-bar");
+    const shortBar = document.getElementById("short-bar");
+    const buyValue = document.getElementById("buy-value");
+    const shortValue = document.getElementById("short-value");
+    if (buyBar) buyBar.style.width = `${buy.toFixed(0)}%`;
+    if (shortBar) shortBar.style.width = `${short.toFixed(0)}%`;
+    if (buyValue) buyValue.textContent = `${buy.toFixed(0)}%`;
+    if (shortValue) shortValue.textContent = `${short.toFixed(0)}%`;
+}
+
+function startConnectionSync() {
+    const syncEl = document.getElementById("sync-status");
+    onValue(
+        ref(db, ".info/connected"),
+        (snapshot) => {
+            if (!syncEl) return;
+            const connected = snapshot.val() === true;
+            syncEl.textContent = connected ? "SYNC: ONLINE" : "SYNC: OFFLINE";
+            syncEl.classList.toggle("online", connected);
+            syncEl.classList.toggle("offline", !connected);
+        },
+        () => {
+            if (!syncEl) return;
+            syncEl.textContent = "SYNC: UNKNOWN";
+            syncEl.classList.remove("online");
+            syncEl.classList.add("offline");
+        }
+    );
+}
+
 // ============================================================
 //  SYNCHRONISATION HUD_CONTRACT
 // ============================================================
@@ -27,10 +105,9 @@ function startHudSync() {
                 if (!hud) return;
 
                 const root = document.getElementById("hud-root");
-                if (!root) {
-                    console.warn("Element hud-root non trouvé");
-                    return;
-                }
+                if (!root) return;
+
+                renderEdgeBars(hud);
 
                 // --- GLOBAL BIAS ---
                 const bias = hud.hud?.global_bias || "NEUTRAL";
@@ -55,6 +132,9 @@ function startHudSync() {
                 const sys = hud.system_status || {};
                 if (sys.last_heartbeat) {
                     const time = new Date(sys.last_heartbeat).toLocaleTimeString();
+                    setSafeText("omar-last-update", "Vivant : " + time);
+                } else if (hud.timestamp) {
+                    const time = new Date(hud.timestamp).toLocaleTimeString();
                     setSafeText("omar-last-update", "Vivant : " + time);
                 }
 
@@ -317,17 +397,25 @@ function startChat() {
                     const div = document.createElement("div");
                     const author = m.author || m.sender || "OMAR";
                     const content = m.message || m.content || "";
-                    div.className = author === "OMAR" ? "bot-msg" : "user-msg";
-                    
-                    // Sécurisé : utiliser textContent au lieu de innerHTML
+                    const ts = m.timestamp ? new Date(m.timestamp) : null;
+                    const isBot = String(author).toUpperCase() === "OMAR";
+                    div.className = isBot ? "bot-msg" : "user-msg";
+
                     const strong = document.createElement("strong");
-                    strong.textContent = author + ":";
+                    strong.textContent = String(author).toUpperCase() + ":";
                     div.appendChild(strong);
-                    
+
                     const messageText = document.createElement("span");
                     messageText.textContent = " " + content;
                     div.appendChild(messageText);
-                    
+
+                    if (ts && !Number.isNaN(ts.getTime())) {
+                        const meta = document.createElement("div");
+                        meta.className = "chat-meta";
+                        meta.textContent = ts.toLocaleTimeString();
+                        div.appendChild(meta);
+                    }
+
                     history.appendChild(div);
                 });
 
@@ -360,6 +448,13 @@ function startChat() {
             console.error("Erreur dans sendBtn.onclick:", error);
         }
     };
+
+    userInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendBtn.click();
+        }
+    });
 }
 
 // ============================================================
@@ -497,18 +592,26 @@ function renderReports(containerId, data, emptyText) {
         const summary = item.summary || "";
         const highlights = Array.isArray(item.highlights) ? item.highlights.filter(Boolean) : [];
 
-        let html = `<strong>${title}</strong><br>`;
+        const strong = document.createElement("strong");
+        strong.textContent = String(title);
+        div.appendChild(strong);
+
         if (summary) {
-            html += `<div class="report-summary">${summary}</div>`;
+            const sum = document.createElement("div");
+            sum.className = "report-summary";
+            sum.textContent = String(summary);
+            div.appendChild(sum);
         }
         if (highlights.length > 0) {
-            html += `<ul class="report-highlights">`;
+            const ul = document.createElement("ul");
+            ul.className = "report-highlights";
             highlights.forEach((h) => {
-                html += `<li>${h}</li>`;
+                const li = document.createElement("li");
+                li.textContent = String(h);
+                ul.appendChild(li);
             });
-            html += `</ul>`;
+            div.appendChild(ul);
         }
-        div.innerHTML = html;
         container.appendChild(div);
     });
 }
@@ -520,12 +623,20 @@ function renderReports(containerId, data, emptyText) {
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Initialisation de l'application OMAR...");
     try {
+        startConnectionSync();
         startHudSync();
         startHudLlmSync();
         startOpportunitiesSync();
         startAlertsSync();
         startReportsSync();
         startChat();
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+                    console.error("Service Worker registration failed:", error);
+                });
+            });
+        }
         console.log("Application OMAR initialisée avec succès");
     } catch (error) {
         console.error("Erreur lors de l'initialisation:", error);
