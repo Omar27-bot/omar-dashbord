@@ -7,6 +7,8 @@
     <meta name="theme-color" content="#0a1218">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="omar-logo-512.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="omar-logo-512.svg">
     <title>OMAR Mobile HUD</title>
 </head>
 <body>
@@ -80,6 +82,12 @@
                     <summary>Rapports</summary>
                     <div id="reports-list"></div>
                 </details>
+                <details>
+                    <summary>Calendrier Eco (FinancialJuice)</summary>
+                    <div class="fj-widget-wrap">
+                        <div id="financialjuice-eco-widget-container"></div>
+                    </div>
+                </details>
             </section>
 
             <section class="panel panel-llm">
@@ -96,5 +104,59 @@
         </main>
     </div>
     <script type="module" src="app.js"></script>
+    <script type="text/javascript">
+        (function () {
+            var containerId = "financialjuice-eco-widget-container";
+            var scriptId = "FJ-Widgets";
+
+            function mountWidget() {
+                if (!window.FJWidgets || !window.FJWidgets.createWidget) {
+                    return;
+                }
+                try {
+                    var options = {};
+                    options.container = containerId;
+                    options.mode = "standard";
+                    options.width = "340px";
+                    options.height = "600px";
+                    options.backColor = "1e222d";
+                    options.fontColor = "b2b5be";
+                    options.widgetType = "ECOCAL";
+                    new window.FJWidgets.createWidget(options);
+                } catch (e) {
+                    console.warn("FinancialJuice widget error:", e);
+                }
+            }
+
+            if (window.FJWidgets && window.FJWidgets.createWidget) {
+                mountWidget();
+                return;
+            }
+
+            if (document.getElementById(scriptId)) {
+                setTimeout(mountWidget, 1200);
+                return;
+            }
+
+            var jo = document.createElement("script");
+            jo.type = "text/javascript";
+            jo.id = scriptId;
+            var r = Math.floor(Math.random() * 10000);
+            jo.src = "https://feed.financialjuice.com/widgets/widgets.js?r=" + r;
+            jo.onerror = function () {
+                var fallback = document.createElement("script");
+                fallback.type = "text/javascript";
+                fallback.id = scriptId + "-fallback";
+                fallback.src = "https://feed.financialjuice.com/widgets/widgets.js";
+                fallback.onload = mountWidget;
+                fallback.onerror = function () {
+                    console.warn("FinancialJuice widget script introuvable (404/network).");
+                };
+                document.head.appendChild(fallback);
+            };
+            jo.onload = mountWidget;
+            document.head.appendChild(jo);
+        })();
+    </script>
 </body>
 </html>
