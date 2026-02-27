@@ -2,7 +2,7 @@
    O.M.A.R — SERVICE WORKER V13 (MOBILE HUD)
    ============================================================ */
 
-const CACHE_NAME = "omar-zenith-cache-v13";
+const CACHE_NAME = "omar-zenith-cache-v15";
 
 const ASSETS = [
     "./",
@@ -17,7 +17,7 @@ const ASSETS = [
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            console.log("[SW] Archivage de la Version 13...");
+            console.log("[SW] Archivage de la Version 15...");
             return cache.addAll(ASSETS);
         })
     );
